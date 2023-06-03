@@ -6,10 +6,12 @@
 #include <cstring>
 #include <cctype>
 
+int Check = 1;
+
 // Khai báo cấu trúc Book để lưu thông tin về sách
 typedef struct Book
 {
-    int masosach, namxuatban, trangthaisach;
+    int masosach, namxuatban, trangthaisach; //trangthaisach: Chua muon:1 // Da muon: 0
     char tensach[50], tentacgia[50], nhaxuatban[50];
 } Book;
 
@@ -43,24 +45,126 @@ BookNode *Khoitaosach(Book B)
     return BN; // Trả về con trỏ BookNode mới
 }
 
-// Hàm này được sử dụng để nhập thông tin về sách từ người dùng
-void Nhapsach(Book *sach)
+char Nhapluachon(char a, char b)
 {
-    printf("Nhap ma so sach:");
-    scanf("%d", &sach->masosach);
+	char lc[20];
+	while(1)
+	{
+		fflush(stdin);
+		gets(lc);
+		if(strlen(lc) == 1 && lc[0] >= a && lc[0] <= b) return lc[0];
+		else
+		{
+			printf("Lua chon cua ban khong hop le, vui long nhap lai: ");
+		}
+	}
+}
+
+int Nhapluachon2(char a, char b)
+{
+	char lc[20];
+	while(1)
+	{
+		fflush(stdin);
+		gets(lc);
+		if(strlen(lc) == 1 && lc[0] >= a && lc[0] <= b) return atoi(lc);
+		else
+		{
+			printf("Lua chon cua ban khong hop le, vui long nhap lai: ");
+		}
+	}
+}
+
+int Nhapmaso()
+{
+	while(1)
+	{
+		char MS[50];
+		int check = 1;
+	    fflush(stdin);
+	    gets(MS);
+    	for(int i = 0; i < strlen(MS); i++)
+    	{
+    		if(MS[i] < '0' || MS[i] > '9')
+    		{
+    			check = 0;
+    			break;
+			}
+		}
+		if(check)
+		{
+			return atoi(MS);
+		}else
+		{
+			printf("Ma sach khong hop le, vui long nhap lai: ");
+		}
+	}
+}
+
+int Nhapnamxuatban()
+{
+	while(1)
+	{
+		char Year[50];
+		int check = 1;
+	    fflush(stdin);
+	    gets(Year);
+	    if(Year[0] != '0' && strlen(Year) == 4)
+	    {
+	    	for(int i = 0; i < 4; i++)
+	    	{
+	    		if(Year[i] < '0' || Year[i] > '9')
+	    		{
+	    			check = 0;
+	    			break;
+				}
+			}
+		}else check = 0;
+		if(check)
+		{
+			return atoi(Year);
+		}else
+		{
+			printf("Nam xuat ban khong hop le (Nam xuat ban phai co 4 chu so), vui long nhap lai: ");
+		}
+	}
+}
+
+int CheckBook(Danhmucsach *danhmuc, int id)
+{
+	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+	{
+		if(BN->sach.masosach == id) return 1;
+	}
+	return 0;
+}
+
+
+// Hàm này được sử dụng để nhập thông tin về sách từ người dùng
+void Nhapsach(Danhmucsach *danhmuc, Book *sach)
+{
+
+	printf("Nhap ma so sach:");
+	while(1)
+	{
+		sach->masosach = Nhapmaso();
+		if(!CheckBook(danhmuc, sach->masosach)) break;
+		else printf("Ma so nay da co trong danh sach, vui long nhap lai ma so khac: ");
+	}
     printf("Nhap nam xuat ban:");
-    scanf("%d", &sach->namxuatban);
+    sach->namxuatban = Nhapnamxuatban();
     printf("Nhap ten sach:");
     fflush(stdin);
-    gets(sach->tensach);
+	gets(sach->tensach);
     printf("Nhap ten tac gia:");
     fflush(stdin);
     gets(sach->tentacgia);
-    printf("Nhap nha xuat ban:");
+    printf("Nhap ten nha xuat ban:");
     fflush(stdin);
     gets(sach->nhaxuatban);
-    sach->trangthaisach = 1; // Thiết lập trạng thái sách mặc định là 1 (sách có sẵn)
+    sach->trangthaisach = 1;
 }
+
 
 // Hàm này được sử dụng để chèn một sách vào đầu danh mục sách
 void InsertFirst(Danhmucsach *danhmuc, BookNode *BN)
@@ -126,20 +230,24 @@ void InsertAfter(Danhmucsach *danhmuc, BookNode *B)
 // Hàm này được sử dụng để đọc danh mục sách từ file "Filedanhsach.txt"
 void Docfile(Danhmucsach *danhmuc)
 {
-    FILE *file = fopen("Filedanhsach.txt", "rb"); // Mở file để đọc (chế độ nhị phân)
-    if (file == NULL)
-    {
-        printf("Khong the mo tep de doc");
-        Khoitao(danhmuc); // Khởi tạo danh mục sách nếu không thể mở file
-        return;
-    }
-    Book sach;
-    while(fread(&sach, sizeof(Book),1,file)>0) {
-        BookNode *BN = Khoitaosach(sach);
-        InsertLast(danhmuc, BN); // Chèn sách vào danh mục từ thông tin đọc được từ file
-    }
+	if(Check)
+	{
+	    FILE *file = fopen("Filedanhsach.txt", "rb");// Mở file để đọc (chế độ nhị phân)
+	    if (file == NULL)
+	    {
+	        printf("Khong the mo tep de doc");
+	        Khoitao(danhmuc);// Khởi tạo danh mục sách nếu không thể mở file
+	        return;
+	    }
+	    Book sach;
+	    while(fread(&sach, sizeof(Book),1,file)>0) {
+	        BookNode *BN = Khoitaosach(sach);
+	        InsertLast(danhmuc, BN);// Chèn sách vào danh mục từ thông tin đọc được từ file
+	    }
+	    Check = 0;
+	}
     printf("Da doc file\n");
-    system("pause"); // Dừng chương trình để người dùng có thể đọc thông báo
+    system("pause");// Dừng chương trình để người dùng có thể đọc thông báo
 }
 
 // Hàm này được sử dụng để xuất danh sách sách trong danh mục ra màn hình
@@ -193,20 +301,22 @@ void XuatDanhSach(Danhmucsach *danhmuc)
 // Hàm này được sử dụng để lưu danh mục sách vào file "Filedanhsach.txt"
 void LuuFile(Danhmucsach *danhmuc)
 {
-    FILE *file = fopen("Filedanhsach.txt", "wb"); // Mở file để ghi (chế độ nhị phân)
+    FILE *file = fopen("Filedanhsach.txt", "wb"); //Mở file để ghi (chế độ nhị phân)
     if (file == NULL)
     {
-        printf("Khong the mo tep de ghi");
+        printf("Khong the mo tep de ghi.");
         return;
     }
 
     // Duyệt qua danh sách liên kết và ghi thông tin từng cuốn sách vào file
     for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
     {
-        fwrite(&(BN->sach), sizeof(Book),1,file); // Ghi thông tin sách vào file
+        fwrite(&(BN->sach), sizeof(Book),1,file); 
     }
 
-    fclose(file); // Đóng file sau khi ghi xong
+    fclose(file); //Đóng file sau khi ghi xong
+    printf("Da luu file.\n");
+    system("pause");
 }
 
 // Hàm này được sử dụng để xóa sách khỏi danh mục dựa trên mã số sách
@@ -683,40 +793,60 @@ void UnBorrowedBooks(Danhmucsach *danhmuc)
 }
 
 //Quản lí mượn sách
-void BorrowBooks(Danhmucsach *danhmuc)
+void BorrowBooks(Danhmucsach *danhmuc, int id)
 {
-	int id;
+    int id;
 	UnBorrowedBooks(danhmuc);
 	if(CheckUnBorrowed(danhmuc))
 	{
-		printf("Chon ma so cuon sach ban muon muon: ");
-		fflush(stdin);
-		scanf("%d",&id);
 		for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
 		{
 			if(BN->sach.masosach == id)
 			{
-				BN->sach.trangthaisach = 0;
-				printf("Cuon sach co ma so '%d' da duoc muon.\n\n", id);
-				return;
+				if(BN->sach.trangthaisach)
+				{
+					BN->sach.trangthaisach = 0;
+					printf("Cuon sach co ma so '%d' da duoc muon.\n\n", id);
+					return;
+				}
+                else
+				{
+					printf("Cuon sach co ma so '%d' khong nam trong danh sach cac cuon sach chua muon.\n", id);
+					return;
+				}
 			}
 		}
-	}
+		printf("Khong co cuon sach nao co ma so '%d'.\n", id);
+	}else printf("Khong con cuon sach nao de muon.\n");
 }
 
 //Quản lí trả sách
 void ReturnBook(Danhmucsach *danhmuc, int id)
 {
-	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+	if(CheckBorrowed(danhmuc))
 	{
-		if(BN->sach.masosach == id)
+		for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
 		{
-			BN->sach.trangthaisach = 1;
-			printf("Cuon sach co ma so '%d' da duoc tra.\n\n", id);
-			return;
+			if(BN->sach.masosach == id)
+			{
+				if(!BN->sach.trangthaisach)
+				{
+					BN->sach.trangthaisach = 1;
+					printf("Cuon sach co ma so '%d' da duoc tra.\n\n", id);
+					return;
+				}else
+				{
+					printf("Cuon sach co ma so '%d' khong nam trong danh sach cac cuon sach da muon.\n", id);
+					return;
+				}
+			}
 		}
+		printf("Khong co cuon sach nao co ma so '%d'.\n", id);
 	}
-	printf("Khong co cuon sach nao co ma so '%d'.\n", id);
+    else
+	{
+		printf("Chua co cuon sach nao duoc muon.\n");
+	}
 }
 
 //Sắp xếp sách theo tên sách thứ tự Alphabet
@@ -739,38 +869,34 @@ void AlphabetNameBook(Danhmucsach *danhmuc)
 	XuatDanhSach(danhmuc);
 }
 
-//Trả về số nguyên tương ứng với chữ đầu tiên của tên tác giả
-int NameOfAuthor(char *a)
-{
-	int i;
-	for (i = strlen(a) - 1; i > 0; i --)
-	{
-		if (a[i] == ' ') return (int) toupper(a[i + 1]);
-	}
-	return (int) toupper(a[i]);
-}
-
-//ĐỔi chỗ 2 BookNode
-void swapnode(BookNode *a, BookNode *b)
-{
-	Book tmp = a->sach;
-	a->sach = b->sach;
-	b->sach = tmp;
-}
-
-//Sắp xếp sách theo tên tác giả
+//Sắp xếp theo tên của tác giả theo Alphabet
 void AlphabetNameAuthor(Danhmucsach *danhmuc)
 {
-	int min = NameOfAuthor(danhmuc->bookHead->sach.tentacgia);
 	for(BookNode *i = danhmuc->bookHead; i != NULL; i = i->nextbook)
 	{
-		for (BookNode *j = i->nextbook; j != NULL; j = j->nextbook)
+		BookNode *tmp = i;
+		int index1 = 0;
+		char s[50];
+		strcmp(s,i->sach.tentacgia);
+		for(int p = 1; p < strlen(s); p++){
+			if(s[p-1] == ' ') index1 = p;	
+		}
+		for(BookNode *j = i->nextbook; j != NULL; j = j->nextbook) 
 		{
-			if (NameOfAuthor(i->sach.tentacgia) > NameOfAuthor(j->sach.tentacgia))
+			int index2 = 0;
+			char c[50];
+			strcmp(c,j->sach.tentacgia);
+			for(int l = 1; l < strlen(c); l++){
+				if(c[l-1] == ' ') index2 = l;	
+			}
+			if(s[index1] > c[index2])
 			{
-				swapnode(i,j);
+				tmp = j;
 			}
 		}
+		Book t = tmp->sach;
+		tmp->sach = i->sach;
+		i->sach = t;
 	}
 	XuatDanhSach(danhmuc);
 }
@@ -823,44 +949,44 @@ void XemDanhSachTheoThuTu(Danhmucsach *danhmuc)
 		system("cls");
 		char lc3;
 		printf("Xem danh sach theo thu tu:\n");
-		printf("x. Theo van alphabet cua ten sach.\n");
-		printf("y. Theo van alphabet cua ten tac gia.\n");
-		printf("z. Theo van alphabet cua ten nha xuat ban.\n");
-		printf("t. Sach duoc xuat ban moi nhat (theo nam).\n");
-		printf("i. Thoat.\n");
+		printf("m. Theo van alphabet cua ten sach.\n");
+		printf("n. Theo van alphabet cua ten tac gia.\n");
+		printf("o. Theo van alphabet cua ten nha xuat ban.\n");
+		printf("p. Sach duoc xuat ban moi nhat (theo nam).\n");
+		printf("q. Thoat.\n");
 		printf("Vui long nhap lua chon cua ban: ");
 		fflush(stdin);
-		scanf("%c", &lc3);
+		lc3 = Nhapluachon('m', 'q');
 		switch(lc3)
 		{
-			case 'x':
+			case 'm':
 			{
 				AlphabetNameBook(danhmuc);
 				system("pause");
 				break;
 			}
-			case 'y':
+			case 'n':
 			{
 				AlphabetNameAuthor(danhmuc);
 				system("pause");
 				break;
 			}
-			case 'z':
+			case 'o':
 			{
 				AlphabetPublisher(danhmuc);
 				system("pause");
 				break;
 			}
-			case 't':
+			case 'p':
 			{
 				LatestBook(danhmuc);
 				system("pause");
 				break;
 			}
-			case 'i':
+			case 'q':
 			{
 				return;
-			}
+			}   
 		}
 	}
 }
@@ -921,6 +1047,48 @@ void EditPublishingYear(Danhmucsach *danhmuc, int publishingyear, int id)
 	}
 }
 
+
+//Đếm danh sách
+int CountBook(Danhmucsach *danhmuc)
+{
+	int count = 0;
+	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+	{
+		count++;
+	}
+	return count;
+}
+
+int CountBorrowedBooks(Danhmucsach *danhmuc)
+{
+	int count = 0;
+	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+	{
+		if(!BN->sach.trangthaisach) count++;
+	}
+	return count;
+}
+
+int CountUnBorrowedBooks(Danhmucsach *danhmuc)
+{
+	int count = 0;
+	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+	{
+		if(BN->sach.trangthaisach) count++;
+	}
+	return count;
+}
+
+int CountAuthorBooks(Danhmucsach *danhmuc, char author[])
+{
+	int count = 0;
+	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+	{
+		if(!strcmp(BN->sach.tentacgia, author)) count++;
+	}
+	return count;
+}
+
 //Các menu lựa chọn
 
 //Menu chính 
@@ -928,17 +1096,18 @@ void Luachon1(Danhmucsach *danhmuc)
 {
     while(1)
     {
+    	system("cls");
         char lc2;
         printf("1. Khoi tao danh sach:\n");
         printf("a. Khoi tao danh muc sach rong\n");
         printf("b. Doc tu file\n");
-        printf("Nhap lua chon cua ban:");
+        printf("Vui long nhap lua chon cua ban: ");
         fflush(stdin);
-        scanf("%c", &lc2);
+        lc2 = Nhapluachon('a', 'b');
         switch(lc2)
         {
         	case 'a':
-	        {
+	        {   
 				printf("Khoi tao danh muc sach rong");
 	            Khoitao(danhmuc);
 	            return;
@@ -947,11 +1116,6 @@ void Luachon1(Danhmucsach *danhmuc)
 	        {
 	            Docfile(danhmuc);
 	            return;
-	        }
-	        default:
-	        {
-	            printf("Lua chon khong hop le, vui long nhap lai:\n");
-	            system("pause");
 	        }
 	    }
     }
@@ -971,14 +1135,14 @@ void Luachon2(Danhmucsach *danhmuc)
         printf("d. Thoat\n");
         printf("Vui long nhap lua chon cua ban:");
         fflush(stdin);
-        scanf("%c", &lc2);
+        lc2 = Nhapluachon('a', 'd');
         switch(lc2)
         {
         	case'a':
 	        {
 			 	printf("a) Them vao dau danh sach:\n");
 	            Book sach;
-	            Nhapsach(&sach);
+	            Nhapsach(danhmuc, &sach);
 	            BookNode *BN = Khoitaosach(sach);
 	            InsertFirst(danhmuc, BN);
 	            printf("Da them cuon sach cua ban vao dau danh sach\n");
@@ -990,7 +1154,7 @@ void Luachon2(Danhmucsach *danhmuc)
 	            printf("b) Them vao sau mot cuon sach nao do");
 	            Book sach;
 	            printf("Nhap thong tin cuon sach o truoc cuon sach can chen vao:\n");
-	            Nhapsach(&sach);
+	            Nhapsach(danhmuc, &sach);
 	            fflush(stdin);
 	            BookNode *B = Khoitaosach(sach);
 	            InsertAfter(danhmuc, B);
@@ -1002,7 +1166,7 @@ void Luachon2(Danhmucsach *danhmuc)
         	{
 	            printf("c) Them vao cuoi danh sach:\n");
 	            Book sach;
-	            Nhapsach(&sach);
+	            Nhapsach(danhmuc, &sach);
 	            BookNode *BN = Khoitaosach(sach);
 	            InsertLast(danhmuc, BN);
 	            printf("Da them cuon sach cua ban vao cuoi danh sach\n");
@@ -1012,11 +1176,6 @@ void Luachon2(Danhmucsach *danhmuc)
        		case 'd':
         	{
             	return;
-        	}
-        	default:
-       		{
-            printf("Lua chon chua ban khong hop le, vui long nhap lai:\n");
-            system("pause");
         	}
     	}
     }
@@ -1039,7 +1198,7 @@ void Luachon3(Danhmucsach *danhmuc)
         printf("g. Thoat\n");
         printf("Vui long nhap lua chon cua ban:");
         fflush(stdin);
-        scanf("%c", &lc2);
+        lc2 = Nhapluachon('a', 'g');
         switch(lc2)
         {
         	case 'a':
@@ -1048,13 +1207,13 @@ void Luachon3(Danhmucsach *danhmuc)
         		printf("a) Xoa mot cuon sach theo ma so sach:\n");
         		printf("Vui long nhap ma so sach cua cuon sach can xoa:");
         		fflush(stdin);
-        		scanf("%d", &id);
+        		id = Nhapmaso();
         		Eraseid(danhmuc, id);
         		system("pause");
         		break;
 			}
 			case 'b':
-			{
+			{	
 				char name[50];
 				printf("b) Xoa mot cuon sach theo ten sach:\n");
         		printf("Vui long nhap ten cua cuon sach can xoa:");
@@ -1062,7 +1221,7 @@ void Luachon3(Danhmucsach *danhmuc)
         		gets(name);
         		EraseNameBook(danhmuc, name);
         		system("pause");
-				break;
+				break;	
 			}
 			case 'c':
         	{
@@ -1080,7 +1239,7 @@ void Luachon3(Danhmucsach *danhmuc)
 				printf("d) Xoa cuon sach o dau danh sach:\n");
 				EraseFirst(danhmuc);
 				system("pause");
-				break;
+				break;	
 			}
 			case 'e':
         	{
@@ -1088,7 +1247,7 @@ void Luachon3(Danhmucsach *danhmuc)
         		printf("e) Xoa cuon sach o sau cuon sach co ma so nao do:\n");
         		printf("Vui long nhap ma so sach cua cuon sach can xoa:");
         		fflush(stdin);
-        		scanf("%d", &id);
+        		id = Nhapmaso();
         		EraseAfter(danhmuc, id);
         		system("pause");
         		break;
@@ -1096,18 +1255,13 @@ void Luachon3(Danhmucsach *danhmuc)
 			case 'f':
 			{
 				printf("f) Xoa cuon sach o cuoi danh sach:\n");
-				EraseLast(danhmuc);
+				EraseLast(danhmuc);	
 				system("pause");
-				break;
+				break;	
 			}
 			case 'g':
 			{
 				return;
-			}
-			default:
-			{
-				printf("Lua chon chua ban khong hop le, vui long nhap lai:\n");
-            	system("pause");
 			}
 		}
 	}
@@ -1127,7 +1281,7 @@ void Luachon4(Danhmucsach *danhmuc)
 		printf("d. Thoat\n");
 		printf("Vui long nhap lua chon cua ban: ");
 		fflush(stdin);
-		scanf("%c",&lc2);
+		lc2 = Nhapluachon('a', 'd');
 		switch(lc2)
 		{
 			case 'a':
@@ -1170,11 +1324,6 @@ void Luachon4(Danhmucsach *danhmuc)
 			{
 				return;
 			}
-			default:
-			{
-				printf("Lua chon chua ban khong hop le, vui long nhap lai:\n");
-            	system("pause");
-			}
 		}
 	}
 }
@@ -1194,7 +1343,7 @@ void Luachon5(Danhmucsach *danhmuc)
         printf("e. Thoat\n");
         printf("Vui long nhap lua chon cua ban:");
         fflush(stdin);
-        scanf("%c", &lc2);
+        lc2 = Nhapluachon('a', 'e');
         switch(lc2)
         {
         	case 'a':
@@ -1204,10 +1353,10 @@ void Luachon5(Danhmucsach *danhmuc)
         		break;
 			}
 			case 'b':
-			{
+			{	
 				BorrowedBooks(danhmuc);
 				system("pause");
-				break;
+				break;	
 			}
 			case 'c':
         	{
@@ -1223,11 +1372,6 @@ void Luachon5(Danhmucsach *danhmuc)
 			case 'e':
         	{
         		return;
-			}
-			default:
-			{
-				printf("Lua chon chua ban khong hop le, vui long nhap lai:\n");
-            	system("pause");
 			}
 		}
 	}
@@ -1246,7 +1390,7 @@ void Luachon6(Danhmucsach *danhmuc)
 		printf("c. Thoat\n");
 		printf("Vui long nhap lua chon cua ban: ");
 		fflush(stdin);
-		scanf("%c",&lc2);
+		lc2 = Nhapluachon('a', 'c');
 		switch(lc2)
 		{
 			case 'a':
@@ -1254,7 +1398,12 @@ void Luachon6(Danhmucsach *danhmuc)
 				system("cls");
 				printf("6. Chuc nang muon/tra sach\n");
 				printf("a. Muon sach\n");
-				BorrowBooks(danhmuc);
+				UnBorrowedBooks(danhmuc);
+				int id;
+				printf("Vui long nhap ma so sach ban muon muon: ");
+				fflush(stdin);
+				id = Nhapmaso();
+				BorrowBooks(danhmuc, id);
 				system("pause");
 				break;
 			}
@@ -1263,10 +1412,11 @@ void Luachon6(Danhmucsach *danhmuc)
 				system("cls");
 				printf("6. Chuc nang muon/tra sach\n");
 				printf("b. Tra sach\n");
+				BorrowedBooks(danhmuc);
 				int id;
 				printf("Vui long nhap ma so sach ban muon tra: ");
 				fflush(stdin);
-				scanf("%d", &id);
+				id = Nhapmaso();
 				ReturnBook(danhmuc, id);
 				system("pause");
 				break;
@@ -1274,11 +1424,6 @@ void Luachon6(Danhmucsach *danhmuc)
 			case 'c':
 			{
 				return;
-			}
-			default:
-			{
-				printf("Lua chon chua ban khong hop le, vui long nhap lai:\n");
-            	system("pause");
 			}
 		}
 	}
@@ -1290,8 +1435,13 @@ void Luachon7(Danhmucsach *danhmuc)
 	XuatDanhSach(danhmuc);
 	int id;
 	printf("Vui long nhap ma so cua cuon sach ban muon thay doi noi dung:");
-	fflush(stdin);
-	scanf("%d", &id);
+	while(1)
+	{
+		fflush(stdin);
+		id = Nhapmaso();
+		if(CheckBook(danhmuc, id)) break;
+		else printf("Khong co cuon sach nao co ma so '%d', vui long nhap lai: ", id);
+	}
 	char lc2;
 	while(1){
 		system("cls");
@@ -1307,7 +1457,7 @@ void Luachon7(Danhmucsach *danhmuc)
 		printf("g. Thoat.\n");
 		printf("Vui long nhap lua chon cua ban:");
 		fflush(stdin);
-		scanf("%c", &lc2);
+		lc2 = Nhapluachon('a', 'g');
 		switch(lc2)
 		{
 			case 'a':
@@ -1349,12 +1499,74 @@ void Luachon7(Danhmucsach *danhmuc)
 				int publishingyear;
 				printf("Nam xuat ban ban muon sua lai la:");
 				fflush(stdin);
-				scanf("%d", &publishingyear);
+				publishingyear = Nhapnamxuatban();
 				EditPublishingYear(danhmuc, publishingyear, id);
 				system("pause");
 				break;
 			}
 			case 'g':
+			{
+				return;
+			}
+		}
+	}
+}
+
+void Luachon8(Danhmucsach *danhmuc)
+{
+	char lc2;
+	while(1)
+	{
+		system("cls");
+		printf("8. Chuc nang thong ke:\n");
+		printf("a. Tong so sach co trong thu vien\n");
+		printf("b. Tong so sach da muon\n");
+		printf("c. Tong so sach chua muon\n");
+		printf("d. Tong so sach cua tac gia nao do\n");
+		printf("e. Thoat\n");
+		printf("Vui long nhap lua chon cua ban: ");
+		fflush(stdin);
+		lc2 = Nhapluachon('a', 'e');
+		switch(lc2)
+		{
+			case 'a':
+			{
+				system("cls");
+				printf("8. Chuc nang thong ke:\n");
+				printf("a. Tong so sach co trong thu vien: %d\n", CountBook(danhmuc));
+				system("pause");
+				break;
+			}
+			case 'b':
+			{
+				system("cls");
+				printf("8. Chuc nang thong ke:\n");
+				printf("b. Tong so sach da muon: %d\n", CountBorrowedBooks(danhmuc));
+				system("pause");
+				break;
+			}
+			case 'c':
+			{
+				system("cls");
+				printf("8. Chuc nang thong ke:\n");
+				printf("c. Tong so sach chua muon: %d\n", CountUnBorrowedBooks(danhmuc));
+				system("pause");
+				break;
+			}
+			case 'd':
+			{
+				system("cls");
+				char author[50];
+				printf("8. Chuc nang thong ke:\n");
+				printf("d. Tong so cua tac gia nao do\n");
+				printf("Vui long nhap ten tac gia: ");
+				fflush(stdin);
+				gets(author);
+				printf("Tong so sach cua tac gia %s dang co trong thu vien: %d\n", author, CountAuthorBooks(danhmuc, author));
+				system("pause");
+				break;
+			}
+			case 'e':
 			{
 				return;
 			}
@@ -1375,12 +1587,13 @@ void menu(int lc1, Danhmucsach *danhmuc)
         printf("5. Chuc nang xem danh sach\n");
         printf("6. Chuc nang muon/tra sach\n");
         printf("7. Chuc nang chinh sua noi dung cua sach\n");
-        printf("8. Luu file\n");
+        printf("8. Chuc nang thong ke\n");
+        printf("9. Luu file\n");
         printf("0. Thoat\n");
         printf("================== End ==================\n");
         printf("Nhap lua chon:");
         fflush(stdin);
-        scanf("%d", &lc1);
+        lc1 = Nhapluachon2('0', '9');
         switch (lc1)
         {
             case 1:
@@ -1420,11 +1633,17 @@ void menu(int lc1, Danhmucsach *danhmuc)
 			}
             case 8:
             {
-                LuuFile(danhmuc);
+                Luachon8(danhmuc);
                 break;
             }
+            case 9:
+            {
+            	LuuFile(danhmuc);
+                break;	
+			}
             case 0:
             {
+            	printf("Da thoat khoi chuong trinh!\n");
                 return;
             }
 			system("pause");
