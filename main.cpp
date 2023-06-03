@@ -6,38 +6,44 @@
 #include <cstring>
 #include <cctype>
 
+// Khai báo cấu trúc Book để lưu thông tin về sách
 typedef struct Book
 {
     int masosach, namxuatban, trangthaisach;
     char tensach[50], tentacgia[50], nhaxuatban[50];
 } Book;
 
+// Khai báo cấu trúc BookNode để tạo danh sách liên kết các cuốn sách
 typedef struct BookNode
 {
     Book sach;
     struct BookNode *nextbook;
 } BookNode;
 
+// Khai báo cấu trúc Danhmucsach để quản lý danh mục sách
 typedef struct Danhmucsach
 {
-    BookNode *bookHead; // Qu?n lý sách ??u tiên trong danh m?c sách
-    BookNode *bookTail; // Qu?n lý sách cu?i cùng trong danh m?c sách
+    BookNode *bookHead; // Con trỏ trỏ tới sách đầu tiên trong danh mục sách
+    BookNode *bookTail; // Con trỏ trỏ tới sách cuối cùng trong danh mục sách
 } Danhmucsach;
 
+// Hàm này được sử dụng để khởi tạo danh mục sách ban đầu
 void Khoitao(Danhmucsach *danhmuc)
 {
-    danhmuc->bookHead = NULL; // Kh?i t?o không có sách nào ??u danh m?c sách
-    danhmuc->bookTail = NULL; // Kh?i t?o không có sách nào cu?i danh m?c sách
+    danhmuc->bookHead = NULL; // Khởi tạo không có sách nào đầu danh mục sách
+    danhmuc->bookTail = NULL; // Khởi tạo không có sách nào cuối danh mục sách
 }
 
+// Hàm này được sử dụng để tạo một BookNode mới với thông tin sách được truyền vào
 BookNode *Khoitaosach(Book B)
 {
-    BookNode *BN = new BookNode; // C?p phát vùng nh? cho BookNode BN
-    BN->sach = B; // truy?n sách B vào BookNode BN;
-    BN->nextbook = NULL;
-    return BN;
+    BookNode *BN = new BookNode; // Cấp phát vùng nhớ cho BookNode BN
+    BN->sach = B; // Truyền thông tin sách B vào BookNode BN
+    BN->nextbook = NULL; // Thiết lập con trỏ nextbook của BN là NULL
+    return BN; // Trả về con trỏ BookNode mới
 }
 
+// Hàm này được sử dụng để nhập thông tin về sách từ người dùng
 void Nhapsach(Book *sach)
 {
     printf("Nhap ma so sach:");
@@ -46,43 +52,49 @@ void Nhapsach(Book *sach)
     scanf("%d", &sach->namxuatban);
     printf("Nhap ten sach:");
     fflush(stdin);
-	gets(sach->tensach);
+    gets(sach->tensach);
     printf("Nhap ten tac gia:");
     fflush(stdin);
     gets(sach->tentacgia);
     printf("Nhap nha xuat ban:");
     fflush(stdin);
     gets(sach->nhaxuatban);
-    sach->trangthaisach = 1;
+    sach->trangthaisach = 1; // Thiết lập trạng thái sách mặc định là 1 (sách có sẵn)
 }
 
+// Hàm này được sử dụng để chèn một sách vào đầu danh mục sách
 void InsertFirst(Danhmucsach *danhmuc, BookNode *BN)
 {
     if(danhmuc->bookHead == NULL)
     {
+        // Nếu danh mục sách đang trống, thì sách mới chèn sẽ là sách đầu tiên và sách cuối cùng trong danh mục
         danhmuc->bookHead = danhmuc->bookTail = BN;
     }
     else
     {
+        // Ngược lại, thì sách mới sẽ trỏ tới sách đầu tiên hiện tại, và sách mới sẽ trở thành sách đầu tiên trong danh mục
         BN->nextbook = danhmuc->bookHead;
         danhmuc->bookHead = BN;
     }
 }
 
+// Hàm này được sử dụng để chèn một sách vào cuối danh mục sách
 void InsertLast(Danhmucsach *danhmuc, BookNode *BN)
 {
-
     if(danhmuc->bookHead == NULL)
     {
+        // Nếu danh mục sách đang trống, thì sách mới chèn sẽ là sách đầu tiên và sách cuối cùng trong danh mục
         danhmuc->bookHead = danhmuc->bookTail = BN;
     }
     else
     {
+        // Ngược lại, sách cuối cùng hiện tại sẽ trỏ tới sách mới, và sách mới sẽ trở thành sách cuối cùng trong danh mục
         danhmuc->bookTail->nextbook = BN;
         danhmuc->bookTail = BN;
     }
 }
 
+// Hàm này được sử dụng để chèn một sách vào sau sách B trong danh mục sách
 void InsertAfter(Danhmucsach *danhmuc, BookNode *B)
 {
     Book sach;
@@ -91,14 +103,17 @@ void InsertAfter(Danhmucsach *danhmuc, BookNode *B)
     BookNode *BN = Khoitaosach(sach);
     if(danhmuc->bookHead->sach.masosach == B->sach.masosach && danhmuc->bookHead->nextbook == NULL)
     {
+        // Nếu sách B là sách đầu tiên trong danh mục và danh mục chỉ có một sách, thì sách mới sẽ được chèn vào cuối danh mục
         InsertLast(danhmuc, B);
     }
     else
     {
+        // Ngược lại, tìm sách B trong danh mục và chèn sách mới vào sau sách B
         for(BookNode *k = danhmuc->bookHead; k != NULL; k = k->nextbook)
         {
             if(k->sach.masosach == B->sach.masosach)
             {
+                // Tạo một sách tạm thời Btmp với thông tin của sách mới
                 BookNode *Btmp = Khoitaosach(BN->sach);
                 BookNode *i = k->nextbook;
                 Btmp->nextbook = i;
@@ -108,267 +123,276 @@ void InsertAfter(Danhmucsach *danhmuc, BookNode *B)
     }
 }
 
+// Hàm này được sử dụng để đọc danh mục sách từ file "Filedanhsach.txt"
 void Docfile(Danhmucsach *danhmuc)
 {
-    FILE *file = fopen("Filedanhsach.txt", "rb");
+    FILE *file = fopen("Filedanhsach.txt", "rb"); // Mở file để đọc (chế độ nhị phân)
     if (file == NULL)
     {
         printf("Khong the mo tep de doc");
-        Khoitao(danhmuc);
+        Khoitao(danhmuc); // Khởi tạo danh mục sách nếu không thể mở file
         return;
     }
     Book sach;
     while(fread(&sach, sizeof(Book),1,file)>0) {
         BookNode *BN = Khoitaosach(sach);
-        InsertLast(danhmuc, BN);
+        InsertLast(danhmuc, BN); // Chèn sách vào danh mục từ thông tin đọc được từ file
     }
     printf("Da doc file\n");
-    system("pause");
+    system("pause"); // Dừng chương trình để người dùng có thể đọc thông báo
 }
 
+// Hàm này được sử dụng để xuất danh sách sách trong danh mục ra màn hình
 void XuatDanhSach(Danhmucsach *danhmuc)
 {
-	printf("						Bang danh muc sach\n") ;
-	for(int i = 1; i <= 117; i++) printf("_");
-	printf("\n|%15s|%25s|%15s|%20s|%15s|%20s|\n","Ma so sach","Ten sach","Ten tac gia","Ten nha xuat ban","Nam xuat ban","Trang thai sach");
-	printf("|");
-	for(int i = 1; i <= 15;i++) printf("_");
-	printf("|");
-	for(int i = 1; i <= 25;i++) printf("_");
-	printf("|");
-	for(int i = 1; i <= 15;i++) printf("_");
-	printf("|");
-	for(int i = 1; i <= 20;i++) printf("_");
-	printf("|");
-	for(int i = 1; i <= 15;i++) printf("_");
-	printf("|");
-	for(int i = 1; i <= 20;i++) printf("_");
-	printf("|");
+    printf("						Bang danh muc sach\n");
+    for(int i = 1; i <= 117; i++) printf("_");
+    printf("\n|%15s|%25s|%15s|%20s|%15s|%20s|\n","Ma so sach","Ten sach","Ten tac gia","Ten nha xuat ban","Nam xuat ban","Trang thai sach");
+    printf("|");
+    for(int i = 1; i <= 15;i++) printf("_");
+    printf("|");
+    for(int i = 1; i <= 25;i++) printf("_");
+    printf("|");
+    for(int i = 1; i <= 15;i++) printf("_");
+    printf("|");
+    for(int i = 1; i <= 20;i++) printf("_");
+    printf("|");
+    for(int i = 1; i <= 15;i++) printf("_");
+    printf("|");
+    for(int i = 1; i <= 20;i++) printf("_");
+    printf("|");
+
     for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
     {
-    	printf("\n|%15d|%25s|%15s|%20s|%15d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
-    	if(BN->sach.trangthaisach)
+        printf("\n|%15d|%25s|%15s|%20s|%15d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
+        if(BN->sach.trangthaisach)
         {
-             printf("%20s|\n","Chua muon");
+            printf("%20s|\n","Chua muon");
         }
         else
         {
-             printf("%20s|\n","Da muon");
+            printf("%20s|\n","Da muon");
         }
         printf("|");
-		for(int i = 1; i <= 15;i++) printf("_");
-		printf("|");
-		for(int i = 1; i <= 25;i++) printf("_");
-		printf("|");
-		for(int i = 1; i <= 15;i++) printf("_");
-		printf("|");
-		for(int i = 1; i <= 20;i++) printf("_");
-		printf("|");
-		for(int i = 1; i <= 15;i++) printf("_");
-		printf("|");
-		for(int i = 1; i <= 20;i++) printf("_");
-		printf("|");
+        for(int i = 1; i <= 15;i++) printf("_");
+        printf("|");
+        for(int i = 1; i <= 25;i++) printf("_");
+        printf("|");
+        for(int i = 1; i <= 15;i++) printf("_");
+        printf("|");
+        for(int i = 1; i <= 20;i++) printf("_");
+        printf("|");
+        for(int i = 1; i <= 15;i++) printf("_");
+        printf("|");
+        for(int i = 1; i <= 20;i++) printf("_");
+        printf("|");
     }
     printf("\n");
 }
 
+// Hàm này được sử dụng để lưu danh mục sách vào file "Filedanhsach.txt"
 void LuuFile(Danhmucsach *danhmuc)
 {
-    FILE *file = fopen("Filedanhsach.txt", "wb"); // M? file ?? ghi (binary mode)
+    FILE *file = fopen("Filedanhsach.txt", "wb"); // Mở file để ghi (chế độ nhị phân)
     if (file == NULL)
     {
         printf("Khong the mo tep de ghi");
         return;
     }
 
-    // Duy?t qua danh sách liên k?t và ghi thông tin t?ng cu?n sách vào file
+    // Duyệt qua danh sách liên kết và ghi thông tin từng cuốn sách vào file
     for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
     {
-        fwrite(&(BN->sach), sizeof(Book),1,file);
+        fwrite(&(BN->sach), sizeof(Book),1,file); // Ghi thông tin sách vào file
     }
 
-    fclose(file); // ?óng file sau khi ghi xong
+    fclose(file); // Đóng file sau khi ghi xong
 }
 
+// Hàm này được sử dụng để xóa sách khỏi danh mục dựa trên mã số sách
 void Eraseid(Danhmucsach *danhmuc, int id)
 {
-	if(danhmuc->bookHead == NULL)
-	{
-		return;
-	}
-	else
-	{
-		for(BookNode *BN = danhmuc->bookHead; BN != danhmuc->bookTail; BN = BN->nextbook)
-		{
-			if(BN->nextbook->sach.masosach == id)
-			{
-				if(BN->nextbook == danhmuc->bookTail)
-				{
-					delete danhmuc->bookTail;
-					BN->nextbook = NULL;
-					danhmuc->bookTail = BN;
-					printf("Cuon sach co ma so '%d' da duoc xoa.\n\n", id);
-					return;
-				}
-				else
-				{
-					BookNode *B = BN->nextbook;
-					BN->nextbook = B->nextbook;
-					delete B;
-					printf("Cuon sach co ma so '%d' da duoc xoa.\n\n", id);
-					return;
-				}
-			}
-		}
-		printf("Khong co cuon sach nao co ma so la '%d'.\n\n",id);
-	}
+    if(danhmuc->bookHead == NULL)
+    {
+        return;
+    }
+    else
+    {
+        for(BookNode *BN = danhmuc->bookHead; BN != danhmuc->bookTail; BN = BN->nextbook)
+        {
+            if(BN->nextbook->sach.masosach == id)
+            {
+                if(BN->nextbook == danhmuc->bookTail)
+                {
+                    delete danhmuc->bookTail; // Xóa sách cuối danh mục
+                    BN->nextbook = NULL;
+                    danhmuc->bookTail = BN;
+                    printf("Cuon sach co ma so '%d' da duoc xoa.\n\n", id);
+                    return;
+                }
+                else
+                {
+                    BookNode *B = BN->nextbook;
+                    BN->nextbook = B->nextbook;
+                    delete B; // Xóa sách
+                    printf("Cuon sach co ma so '%d' da duoc xoa.\n\n", id);
+                    return;
+                }
+            }
+        }
+        printf("Khong co cuon sach nao co ma so la '%d'.\n\n",id);
+    }
 }
 
+// Hàm này được sử dụng để xóa sách khỏi danh mục dựa trên tên sách
 void EraseNameBook(Danhmucsach *danhmuc, char name[50])
 {
-	if(danhmuc->bookHead == NULL)
-	{
-		return;
-	}
-	else
-	{
-		for(BookNode *BN = danhmuc->bookHead; BN != danhmuc->bookTail; BN = BN->nextbook)
-		{
-			if(strcmp(BN->nextbook->sach.tensach, name) == 0)
-			{
-				if(BN->nextbook == danhmuc->bookTail)
-				{
-					delete danhmuc->bookTail;
-					BN->nextbook = NULL;
-					danhmuc->bookTail = BN;
-					printf("Cuon sach co ten '%s' da duoc xoa.\n\n", name);
-					return;
-				}
-				else
-				{
-					BookNode *B = BN->nextbook;
-					BN->nextbook = B->nextbook;
-					delete B;
-					printf("Cuon sach co ten '%s' da duoc xoa.\n\n", name);
-					return;
-				}
-			}
-		}
-		printf("Khong co cuon sach nao co ten la '%s'.\n\n",name);
-	}
+    if(danhmuc->bookHead == NULL)
+    {
+        return;
+    }
+    else
+    {
+        for(BookNode *BN = danhmuc->bookHead; BN != danhmuc->bookTail; BN = BN->nextbook)
+        {
+            if(strcmp(BN->nextbook->sach.tensach, name) == 0)
+            {
+                if(BN->nextbook == danhmuc->bookTail)
+                {
+                    delete danhmuc->bookTail; // Xóa sách cuối danh mục
+                    BN->nextbook = NULL;
+                    danhmuc->bookTail = BN;
+                    printf("Cuon sach co ten '%s' da duoc xoa.\n\n", name);
+                    return;
+                }
+                else
+                {
+                    BookNode *B = BN->nextbook;
+                    BN->nextbook = B->nextbook;
+                    delete B; // Xóa sách
+                    printf("Cuon sach co ten '%s' da duoc xoa.\n\n", name);
+                    return;
+                }
+            }
+        }
+        printf("Khong co cuon sach nao co ten la '%s'.\n\n",name);
+    }
 }
 
+// Hàm này được sử dụng để xóa sách khỏi danh mục dựa trên tên tác giả
 void EraseNameAuthor(Danhmucsach *danhmuc, char author[50])
 {
-	if(danhmuc->bookHead == NULL)
-	{
-		return;
-	}
-	else
-	{
-		int tmp = 0;
-		BookNode *BN = danhmuc->bookHead;
-		while(BN != danhmuc->bookTail)
-		{
-			if(strcmp(BN->nextbook->sach.tentacgia, author) == 0)
-			{
-				if(BN->nextbook == danhmuc->bookTail)
-				{
-					delete danhmuc->bookTail;
-					BN->nextbook = NULL;
-					danhmuc->bookTail = BN;
-					tmp++;
-
-
-				}
-				else
-				{
-					BookNode *B = BN->nextbook;
-					BN->nextbook = B->nextbook;
-					delete B;
-					tmp++;
-
-				}
-			}
-			else
-			{
-				BN = BN->nextbook;
-			}
-		}
-		if(tmp) printf("Tat ca cac cuon sach co tac gia la '%s' da duoc xoa.\n", author);
-		else printf("Khong co cuon sach nao co tac gia la '%s'.\n", author);
-	}
+    if(danhmuc->bookHead == NULL)
+    {
+        return;
+    }
+    else
+    {
+        int tmp = 0;
+        BookNode *BN = danhmuc->bookHead;
+        while(BN != danhmuc->bookTail)
+        {
+            if(strcmp(BN->nextbook->sach.tentacgia, author) == 0)
+            {
+                if(BN->nextbook == danhmuc->bookTail)
+                {
+                    delete danhmuc->bookTail; // Xóa sách cuối danh mục
+                    BN->nextbook = NULL;
+                    danhmuc->bookTail = BN;
+                    tmp++;
+                }
+                else
+                {
+                    BookNode *B = BN->nextbook;
+                    BN->nextbook = B->nextbook;
+                    delete B; // Xóa sách
+                    tmp++;
+                }
+            }
+            else
+            {
+                BN = BN->nextbook;
+            }
+        }
+        if(tmp) printf("Tat ca cac cuon sach co tac gia la '%s' da duoc xoa.\n", author);
+        else printf("Khong co cuon sach nao co tac gia la '%s'.\n", author);
+    }
 }
 
+// Hàm này được sử dụng để xóa sách đầu tiên khỏi danh mục
 void EraseFirst(Danhmucsach *danhmuc)
 {
-	if(danhmuc->bookHead == NULL)
-	{
-		return;
-	}
-	else
-	{
-		BookNode *BN = danhmuc->bookHead;
-		danhmuc->bookHead = danhmuc->bookHead->nextbook;
-		delete BN;
-	}
+    if(danhmuc->bookHead == NULL)
+    {
+        return;
+    }
+    else
+    {
+        BookNode *BN = danhmuc->bookHead;
+        danhmuc->bookHead = danhmuc->bookHead->nextbook;
+        delete BN; // Xóa sách đầu tiên
+    }
 }
 
+// Hàm này được sử dụng để xóa sách sau một sách có mã số cụ thể khỏi danh mục
 void EraseAfter(Danhmucsach *danhmuc, int id)
 {
-	if(danhmuc->bookHead == NULL)
-	{
-		return;
-	}
-	else
-	{
-		for(BookNode *BN = danhmuc->bookHead; BN != danhmuc->bookTail; BN = BN->nextbook)
-		{
-			if(BN->sach.masosach == id)
-			{
-				if(BN->nextbook == danhmuc->bookTail)
-				{
-					delete danhmuc->bookTail;
-					BN->nextbook = NULL;
-					danhmuc->bookTail = BN;
-					return;
-				}
-				else
-				{
-					BookNode *B = BN->nextbook;
-					BN->nextbook = B->nextbook;
-					delete B;
-					return;
-				}
-			}
-		}
-//		printf("Khong co cuon sach nao co ma so la %d\n",id);
-	}
+    if(danhmuc->bookHead == NULL)
+    {
+        return;
+    }
+    else
+    {
+        for(BookNode *BN = danhmuc->bookHead; BN != danhmuc->bookTail; BN = BN->nextbook)
+        {
+            if(BN->sach.masosach == id)
+            {
+                if(BN->nextbook == danhmuc->bookTail)
+                {
+                    delete danhmuc->bookTail; // Xóa sách cuối danh mục
+                    BN->nextbook = NULL;
+                    danhmuc->bookTail = BN;
+                    return;
+                }
+                else
+                {
+                    BookNode *B = BN->nextbook;
+                    BN->nextbook = B->nextbook;
+                    delete B; // Xóa sách
+                    return;
+                }
+            }
+        }
+        // printf("Khong co cuon sach nao co ma so la %d\n",id);
+    }
 }
 
+// Hàm này được sử dụng để xóa sách cuối cùng khỏi danh mục
 void EraseLast(Danhmucsach *danhmuc)
 {
-	if(danhmuc->bookHead == NULL)
-	{
-		return;
-	}
-	else
-	{
-		for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
-		{
-			if(BN->nextbook == danhmuc->bookTail)
-			{
-				delete danhmuc->bookTail;
-				BN->nextbook = NULL;
-				danhmuc->bookTail = BN;
-				return;
-			}
-		}
-	}
+    if(danhmuc->bookHead == NULL)
+    {
+        return;
+    }
+    else
+    {
+        for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+        {
+            if(BN->nextbook == danhmuc->bookTail)
+            {
+                delete danhmuc->bookTail; // Xóa sách cuối danh mục
+                BN->nextbook = NULL;
+                danhmuc->bookTail = BN;
+                return;
+            }
+        }
+    }
 }
 
+//Tìm kiếm sách theo tên của sách
 void FindNameBook(Danhmucsach *danhmuc, char name[50])
 {
+	//In ra bảng danh sách các cuốn sách và thông tin
 	printf("				Thong tin nhung cuon sach co ten la %s\n", name) ;
 	for(int i = 1; i <= 117; i++) printf("_");
 	printf("\n|%15s|%25s|%15s|%20s|%15s|%20s|\n","Ma so sach","Ten sach","Ten tac gia","Ten nha xuat ban","Nam xuat ban","Trang thai sach");
@@ -414,9 +438,10 @@ void FindNameBook(Danhmucsach *danhmuc, char name[50])
 		}
     }
     printf("\n");
-    system("pause");
+    system("pause"); //Dừng màn hình cho đến khi nhấn phím bất kì
 }
 
+//Tìm kiếm sách theo tên của tác giả
 void FindNameAuthor(Danhmucsach *danhmuc, char author[50]){
 	printf("				Thong tin nhung cuon sach cua tac gia: %s\n", author) ;
 	for(int i = 1; i <= 117; i++) printf("_");
@@ -466,6 +491,7 @@ void FindNameAuthor(Danhmucsach *danhmuc, char author[50]){
     system("pause");
 }
 
+//Tìm kiếm sách theo tên của Nhà Xuất Bản
 void FindNamePublisher(Danhmucsach *danhmuc, char publisher[50])
 {
 	printf("				Thong tin nhung cuon sach co nha xuat ban la %s\n", publisher) ;
@@ -516,6 +542,7 @@ void FindNamePublisher(Danhmucsach *danhmuc, char publisher[50])
     system("pause");
 }
 
+//Kiểm tra trạng thái sách đã mượn
 int CheckBorrowed(Danhmucsach *danhmuc)
 {
 	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
@@ -528,6 +555,7 @@ int CheckBorrowed(Danhmucsach *danhmuc)
     return 0;
 }
 
+//Kiểm tra sách chưa mượn
 int CheckUnBorrowed(Danhmucsach *danhmuc)
 {
 	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
@@ -540,6 +568,7 @@ int CheckUnBorrowed(Danhmucsach *danhmuc)
     return 0;
 }
 
+//Danh sách các cuốn sách đã mượn
 void BorrowedBooks(Danhmucsach *danhmuc)
 {
 	if(CheckBorrowed(danhmuc))
@@ -596,6 +625,7 @@ void BorrowedBooks(Danhmucsach *danhmuc)
 	}
 }
 
+//Danh sách các cuốn sách chưa mượn
 void UnBorrowedBooks(Danhmucsach *danhmuc)
 {
 	if(CheckUnBorrowed(danhmuc))
@@ -652,6 +682,7 @@ void UnBorrowedBooks(Danhmucsach *danhmuc)
 	}
 }
 
+//Quản lí mượn sách
 void BorrowBooks(Danhmucsach *danhmuc)
 {
 	int id;
@@ -673,6 +704,7 @@ void BorrowBooks(Danhmucsach *danhmuc)
 	}
 }
 
+//Quản lí trả sách
 void ReturnBook(Danhmucsach *danhmuc, int id)
 {
 	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
@@ -687,6 +719,7 @@ void ReturnBook(Danhmucsach *danhmuc, int id)
 	printf("Khong co cuon sach nao co ma so '%d'.\n", id);
 }
 
+//Sắp xếp sách theo tên sách thứ tự Alphabet
 void AlphabetNameBook(Danhmucsach *danhmuc)
 {
 	for(BookNode *i = danhmuc->bookHead; i != NULL; i = i->nextbook)
@@ -706,6 +739,7 @@ void AlphabetNameBook(Danhmucsach *danhmuc)
 	XuatDanhSach(danhmuc);
 }
 
+//Trả về số nguyên tương ứng với chữ đầu tiên của tên tác giả
 int NameOfAuthor(char *a)
 {
 	int i;
@@ -716,6 +750,7 @@ int NameOfAuthor(char *a)
 	return (int) toupper(a[i]);
 }
 
+//ĐỔi chỗ 2 BookNode
 void swapnode(BookNode *a, BookNode *b)
 {
 	Book tmp = a->sach;
@@ -723,6 +758,7 @@ void swapnode(BookNode *a, BookNode *b)
 	b->sach = tmp;
 }
 
+//Sắp xếp sách theo tên tác giả
 void AlphabetNameAuthor(Danhmucsach *danhmuc)
 {
 	int min = NameOfAuthor(danhmuc->bookHead->sach.tentacgia);
@@ -739,6 +775,7 @@ void AlphabetNameAuthor(Danhmucsach *danhmuc)
 	XuatDanhSach(danhmuc);
 }
 
+//Sắp xếp sách theo tên nhà Xuất bản
 void AlphabetPublisher(Danhmucsach *danhmuc)
 {
 	for(BookNode *i = danhmuc->bookHead; i != NULL; i = i->nextbook)
@@ -758,6 +795,7 @@ void AlphabetPublisher(Danhmucsach *danhmuc)
 	XuatDanhSach(danhmuc);
 }
 
+//Hiển thị sách từ mới nhất -> Cũ nhất (Theo năm xuất bản)
 void LatestBook(Danhmucsach *danhmuc)
 {
 	for(BookNode *i = danhmuc->bookHead; i != NULL; i = i->nextbook)
@@ -777,6 +815,7 @@ void LatestBook(Danhmucsach *danhmuc)
 	XuatDanhSach(danhmuc);
 }
 
+//Xem danh sách theo thứ tự mong muốn
 void XemDanhSachTheoThuTu(Danhmucsach *danhmuc)
 {
 	while(1)
@@ -839,6 +878,8 @@ void EditNameBook(Danhmucsach *danhmuc, char name[50], int id)
 	}
 }
 
+//Các hảm chỉnh sửa thông tin sách
+//Sửa tên Tác giả
 void EditNameAuthor(Danhmucsach *danhmuc, char author[50], int id)
 {
 	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
@@ -852,6 +893,7 @@ void EditNameAuthor(Danhmucsach *danhmuc, char author[50], int id)
 	}
 }
 
+//Sửa tên Nhà Xuất bản
 void EditNamePublisher(Danhmucsach *danhmuc, char publisher[50], int id)
 {
 	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
@@ -865,6 +907,7 @@ void EditNamePublisher(Danhmucsach *danhmuc, char publisher[50], int id)
 	}
 }
 
+//Sửa năm xuất bản
 void EditPublishingYear(Danhmucsach *danhmuc, int publishingyear, int id)
 {
 	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
@@ -878,6 +921,9 @@ void EditPublishingYear(Danhmucsach *danhmuc, int publishingyear, int id)
 	}
 }
 
+//Các menu lựa chọn
+
+//Menu chính 
 void Luachon1(Danhmucsach *danhmuc)
 {
     while(1)
@@ -911,6 +957,7 @@ void Luachon1(Danhmucsach *danhmuc)
     }
 }
 
+//Menu thêm sách
 void Luachon2(Danhmucsach *danhmuc)
 {
     char lc2;
@@ -975,6 +1022,7 @@ void Luachon2(Danhmucsach *danhmuc)
     }
 }
 
+//Menu Xóa Sách
 void Luachon3(Danhmucsach *danhmuc)
 {
 	char lc2;
@@ -1064,6 +1112,8 @@ void Luachon3(Danhmucsach *danhmuc)
 		}
 	}
 }
+
+//Menu tìm kiếm sách
 void Luachon4(Danhmucsach *danhmuc)
 {
 	char lc2;
@@ -1129,6 +1179,7 @@ void Luachon4(Danhmucsach *danhmuc)
 	}
 }
 
+//Menu Xem Danh sách
 void Luachon5(Danhmucsach *danhmuc)
 {
 	char lc2;
@@ -1182,6 +1233,7 @@ void Luachon5(Danhmucsach *danhmuc)
 	}
 }
 
+//Menu mượn trả sách
 void Luachon6(Danhmucsach *danhmuc)
 {
 	char lc2;
@@ -1232,6 +1284,7 @@ void Luachon6(Danhmucsach *danhmuc)
 	}
 }
 
+//Menu Chỉnh sửa thông tin sách có sẵn
 void Luachon7(Danhmucsach *danhmuc)
 {
 	XuatDanhSach(danhmuc);
