@@ -20,20 +20,20 @@ typedef struct BookNode
 
 typedef struct Danhmucsach
 {
-    BookNode *bookHead; // Qu?n lÃ½ sÃ¡ch ??u tiÃªn trong danh m?c sÃ¡ch
-    BookNode *bookTail; // Qu?n lÃ½ sÃ¡ch cu?i cÃ¹ng trong danh m?c sÃ¡ch
+    BookNode *bookHead; // Qu?n lý sách ??u tiên trong danh m?c sách
+    BookNode *bookTail; // Qu?n lý sách cu?i cùng trong danh m?c sách
 } Danhmucsach;
 
 void Khoitao(Danhmucsach *danhmuc)
 {
-    danhmuc->bookHead = NULL; // Kh?i t?o khÃ´ng cÃ³ sÃ¡ch nÃ o ??u danh m?c sÃ¡ch
-    danhmuc->bookTail = NULL; // Kh?i t?o khÃ´ng cÃ³ sÃ¡ch nÃ o cu?i danh m?c sÃ¡ch
+    danhmuc->bookHead = NULL; // Kh?i t?o không có sách nào ??u danh m?c sách
+    danhmuc->bookTail = NULL; // Kh?i t?o không có sách nào cu?i danh m?c sách
 }
 
 BookNode *Khoitaosach(Book B)
 {
-    BookNode *BN = new BookNode; // C?p phÃ¡t vÃ¹ng nh? cho BookNode BN
-    BN->sach = B; // truy?n sÃ¡ch B vÃ o BookNode BN;
+    BookNode *BN = new BookNode; // C?p phát vùng nh? cho BookNode BN
+    BN->sach = B; // truy?n sách B vào BookNode BN;
     BN->nextbook = NULL;
     return BN;
 }
@@ -288,13 +288,13 @@ void LuuFile(Danhmucsach *danhmuc)
         return;
     }
 
-    // Duy?t qua danh sÃ¡ch liÃªn k?t vÃ  ghi thÃ´ng tin t?ng cu?n sÃ¡ch vÃ o file
+    // Duy?t qua danh sách liên k?t và ghi thông tin t?ng cu?n sách vào file
     for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
     {
         fwrite(&(BN->sach), sizeof(Book),1,file);
     }
 
-    fclose(file); // ?Ã³ng file sau khi ghi xong
+    fclose(file); // ?óng file sau khi ghi xong
     printf("Da luu file.\n");
     system("pause");
 }
@@ -822,6 +822,25 @@ void ReturnBook(Danhmucsach *danhmuc, int id)
 	}
 }
 
+void SortByID(Danhmucsach *danhmuc)
+{
+	for(BookNode *i = danhmuc->bookHead; i != NULL; i = i->nextbook)
+	{
+		BookNode *tmp = i;
+		for(BookNode *j = i->nextbook; j != NULL; j = j->nextbook)  
+		{
+			if(tmp->sach.masosach > j->sach.masosach)
+			{
+				tmp = j;
+			}
+		}
+		Book t = tmp->sach;
+		tmp->sach = i->sach;
+		i->sach = t;
+	}
+	XuatDanhSach(danhmuc);
+}
+
 void AlphabetNameBook(Danhmucsach *danhmuc)
 {
 	for(BookNode *i = danhmuc->bookHead; i != NULL; i = i->nextbook)
@@ -921,10 +940,11 @@ void XemDanhSachTheoThuTu(Danhmucsach *danhmuc)
 		printf("n. Theo van alphabet cua ten tac gia.\n");
 		printf("o. Theo van alphabet cua ten nha xuat ban.\n");
 		printf("p. Sach duoc xuat ban moi nhat (theo nam).\n");
-		printf("q. Thoat.\n");
+		printf("q. Xem danh sach theo thu tu tang dan cua ID.\n");
+		printf("r. Thoat\n");
 		printf("Vui long nhap lua chon cua ban: ");
 		fflush(stdin);
-		lc3 = Nhapluachon('m', 'q');
+		lc3 = Nhapluachon('m', 'r');
 		switch(lc3)
 		{
 			case 'm':
@@ -952,6 +972,12 @@ void XemDanhSachTheoThuTu(Danhmucsach *danhmuc)
 				break;
 			}
 			case 'q':
+			{
+				SortByID(danhmuc);
+				system("pause");
+				break;
+			}
+			case 'r':
 			{
 				return;
 			}
@@ -1522,16 +1548,18 @@ void Luachon8(Danhmucsach *danhmuc)
 			case 'b':
 			{
 				system("cls");
+				int a = CountBorrowedBooks(danhmuc), b = CountBook(danhmuc);
 				printf("8. Chuc nang thong ke:\n");
-				printf("b. Tong so sach da muon: %d\n", CountBorrowedBooks(danhmuc));
+				printf("b. Tong so sach da muon: %d / %d Chiem khoang %.2lf%% tong so sach trong thu vien\n",a, b, 1.0 * a / b * 100);
 				system("pause");
 				break;
 			}
 			case 'c':
 			{
 				system("cls");
+				int a = CountUnBorrowedBooks(danhmuc), b = CountBook(danhmuc);
 				printf("8. Chuc nang thong ke:\n");
-				printf("c. Tong so sach chua muon: %d\n", CountUnBorrowedBooks(danhmuc));
+				printf("c. Tong so sach chua muon: %d / %d Chiem khoang %.2lf%% tong so sach trong thu vien\n",a, b, 1.0 * a / b * 100);
 				system("pause");
 				break;
 			}
@@ -1544,7 +1572,8 @@ void Luachon8(Danhmucsach *danhmuc)
 				printf("Vui long nhap ten tac gia: ");
 				fflush(stdin);
 				gets(author);
-				printf("Tong so sach cua tac gia %s dang co trong thu vien: %d\n", author, CountAuthorBooks(danhmuc, author));
+				int a = CountAuthorBooks(danhmuc,author), b = CountBook(danhmuc);
+				printf("Tong so sach cua tac gia %s dang co trong thu vien: %d / %d Chiem khoang %.2lf%% Tong so sach co trong thu vien\n", author, a, b, 1.0 * a / b * 100);
 				system("pause");
 				break;
 			}
@@ -1557,7 +1586,8 @@ void Luachon8(Danhmucsach *danhmuc)
 				printf("Vui long nhap ten Nha Xuan Ban : ");
 				fflush(stdin);
 				gets(publisher);
-				printf("Tong so sach cua Nha Xuat Ban %s dang co trong thu vien: %d\n", publisher, CountPublisherBooks(danhmuc, publisher));
+				int a = CountPublisherBooks(danhmuc, publisher), b = CountBook(danhmuc);
+				printf("Tong so sach cua Nha Xuat Ban %s dang co trong thu vien: %d / %d Chiem khoang %.2lf%% tong so sach trong thu vien\n",publisher, a, b, 1.0 * a / b * 100);
 				system("pause");
 				break;
 			}
