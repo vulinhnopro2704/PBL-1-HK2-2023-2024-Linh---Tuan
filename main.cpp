@@ -41,7 +41,7 @@ void Khoitao(Danhmucsach *danhmuc)
 // Khởi tạo một nút sách mới
 BookNode *Khoitaosach(Book B)
 {
-    BookNode *BN = new BookNode; // Cấp phát vùng nhớ cho một nút sách mới
+    BookNode *BN = (BookNode*)malloc(sizeof(BookNode)); // Cấp phát vùng nhớ cho một nút sách mới
     BN->sach = B;                // Gán thông tin sách từ tham số B vào nút sách mới
     BN->nextbook = NULL;
     return BN;
@@ -170,6 +170,64 @@ void Nhapsach(Danhmucsach *danhmuc, Book *sach)
     sach->trangthaisach = 1;
 }
 
+// Các hàm thống kê
+
+//Thống kê số sách hiện có
+int CountBook(Danhmucsach *danhmuc)
+{
+    int count = 0;
+    for (BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+    {
+        count++;
+    }
+    return count;
+}
+
+//Thống kê Số sách đã mượn
+int CountBorrowedBooks(Danhmucsach *danhmuc)
+{
+	int count = 0;
+	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+	{
+		if(!BN->sach.trangthaisach) count++;
+	}
+	return count;
+}
+
+//Thống kê số sách chưa mượn
+int CountUnBorrowedBooks(Danhmucsach *danhmuc)
+{
+	int count = 0;
+	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+	{
+		if(BN->sach.trangthaisach) count++;
+	}
+	return count;
+}
+
+//Thống kê Tác giả sách
+int CountAuthorBooks(Danhmucsach *danhmuc, char author[])
+{
+    int count = 0;
+    for (BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+    {
+        if (strcasecmp(BN->sach.tentacgia, author) == 0)
+            count++;
+    }
+    return count;
+}
+
+//Thống kê nhà xuất bản
+int CountPublisherBooks(Danhmucsach *danhmuc, char publisher[])
+{
+    int count = 0;
+    for (BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+    {
+        if (strcasecmp(BN->sach.nhaxuatban, publisher) == 0)
+            count++;
+    }
+    return count;
+}
 
 void InsertFirst(Danhmucsach *danhmuc, BookNode *BN)
 {
@@ -281,36 +339,14 @@ void Docfile(Danhmucsach *danhmuc)
 //In ra danh sách
 void XuatDanhSach(Danhmucsach *danhmuc)
 {
-	int ID = 10, book = 40, author = 25, NXB = 25, NamXB = 10, TrangThai = 12;
-	int sum = ID + book + author + NXB + NamXB + TrangThai + 7;
-	printf("						Bang danh muc sach\n") ;
-	for(int i = 1; i <= sum; i++) printf("_");
-	printf("\n|%10s|%40s|%25s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
-	printf("|");
-	for(int i = 1; i <= ID;i++) printf("_");
-	printf("|");
-	for(int i = 1; i <= book;i++) printf("_");
-	printf("|");
-	for(int i = 1; i <= author;i++) printf("_");
-	printf("|");
-	for(int i = 1; i <= NXB;i++) printf("_");
-	printf("|");
-	for(int i = 1; i <= NamXB;i++) printf("_");
-	printf("|");
-	for(int i = 1; i <= TrangThai;i++) printf("_");
-	printf("|");
-    for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
-    {
-    	printf("\n|%10d|%40s|%25s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
-    	if(BN->sach.trangthaisach)
-        {
-             printf("%12s|\n","Chua muon");
-        }
-        else
-        {
-             printf("%12s|\n","Da muon");
-        }
-        printf("|");
+	if(CountBook(danhmuc))
+	{
+		int ID = 10, book = 40, author = 25, NXB = 25, NamXB = 10, TrangThai = 12;
+		int sum = ID + book + author + NXB + NamXB + TrangThai + 7;
+		printf("						Bang danh muc sach\n") ;
+		for(int i = 1; i <= sum; i++) printf("_");
+		printf("\n|%10s|%40s|%25s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
+		printf("|");
 		for(int i = 1; i <= ID;i++) printf("_");
 		printf("|");
 		for(int i = 1; i <= book;i++) printf("_");
@@ -323,8 +359,37 @@ void XuatDanhSach(Danhmucsach *danhmuc)
 		printf("|");
 		for(int i = 1; i <= TrangThai;i++) printf("_");
 		printf("|");
-    }
-    printf("\n");
+	    for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
+	    {
+	    	printf("\n|%10d|%40s|%25s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
+	    	if(BN->sach.trangthaisach)
+	        {
+	             printf("%12s|\n","Chua muon");
+	        }
+	        else
+	        {
+	             printf("%12s|\n","Da muon");
+	        }
+	        printf("|");
+			for(int i = 1; i <= ID;i++) printf("_");
+			printf("|");
+			for(int i = 1; i <= book;i++) printf("_");
+			printf("|");
+			for(int i = 1; i <= author;i++) printf("_");
+			printf("|");
+			for(int i = 1; i <= NXB;i++) printf("_");
+			printf("|");
+			for(int i = 1; i <= NamXB;i++) printf("_");
+			printf("|");
+			for(int i = 1; i <= TrangThai;i++) printf("_");
+			printf("|");
+	    }
+	    printf("\n");
+	}
+	else
+	{
+		printf("Thu vien chua co quyen sach nao.\n");
+	}
 }
 
 //Lưu file
@@ -480,6 +545,7 @@ void EraseFirst(Danhmucsach *danhmuc)
 	{
 		BookNode *BN = danhmuc->bookHead;
 		danhmuc->bookHead = danhmuc->bookHead->nextbook;
+		printf("Da xoa cuon sach o dau danh sach.\n");
 		delete BN;
 	}
 }
@@ -505,6 +571,7 @@ void EraseAfter(Danhmucsach *danhmuc, int id)
 					delete danhmuc->bookTail;
 					BN->nextbook = NULL;
 					danhmuc->bookTail = BN;
+					printf("Da xoa cuon sach o sau cuon sach co ma so %d.\n", id);
 					return;
 				}
 				else
@@ -512,6 +579,7 @@ void EraseAfter(Danhmucsach *danhmuc, int id)
 					// Xóa cuốn sách sau cuốn sách không phải là cuốn sách cuối cùng
 					BookNode *B = BN->nextbook;
 					BN->nextbook = B->nextbook;
+					printf("Da xoa cuon sach o sau cuon sach co ma so %d.\n", id);
 					delete B;
 					return;
 				}
@@ -539,6 +607,7 @@ void EraseLast(Danhmucsach *danhmuc)
 				delete danhmuc->bookTail;
 				BN->nextbook = NULL;
 				danhmuc->bookTail = BN;
+				printf("Da xoa cuon sach o cuoi danh sach.\n");
 				return;
 			}
 		}
@@ -1107,7 +1176,7 @@ BookNode* MergeListsByName(BookNode* a, BookNode* b)
 }
 
 // Hàm sắp xếp danh sách sách theo tên sách bằng Merge Sort
-void MergeSortByName(BookNode** headRef) .
+void MergeSortByName(BookNode** headRef)
 {
     BookNode* head = *headRef;
     BookNode* a;
@@ -1356,63 +1425,38 @@ void EditPublishingYear(Danhmucsach *danhmuc, int publishingyear, int id)
 	}
 }
 
-// Các hàm thống kê
-
-//Thống kê số sách hiện có
-int CountBook(Danhmucsach *danhmuc)
+void EditBookStatus(Danhmucsach *danhmuc, int id)
 {
-    int count = 0;
-    for (BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
-    {
-        count++;
-    }
-    return count;
-}
-
-//Thống kê Số sách đã mượn
-int CountBorrowedBooks(Danhmucsach *danhmuc)
-{
-	int count = 0;
 	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
 	{
-		if(!BN->sach.trangthaisach) count++;
+		if(BN->sach.masosach == id)
+		{
+			if(BN->sach.trangthaisach)
+			{
+				printf("Da chuyen trang thai cua sach thanh da muon.\n");
+				BN->sach.trangthaisach = 0;
+				return;
+			}else
+			{
+				printf("Da chuyen trang thai cua sach thanh chua muon.\n");
+				BN->sach.trangthaisach = 1;
+				return;
+			}
+		}
 	}
-	return count;
 }
 
-//Thống kê số sách chưa mượn
-int CountUnBorrowedBooks(Danhmucsach *danhmuc)
+void EditID(Danhmucsach *danhmuc, int id2, int id)
 {
-	int count = 0;
 	for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
 	{
-		if(BN->sach.trangthaisach) count++;
+		if(BN->sach.masosach == id)
+		{
+			BN->sach.masosach = id2;
+			printf("Da sua ma so sach thanh '%d'.\n", id2);
+			return;
+		}
 	}
-	return count;
-}
-
-//Thống kê Tác giả sách
-int CountAuthorBooks(Danhmucsach *danhmuc, char author[])
-{
-    int count = 0;
-    for (BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
-    {
-        if (strcasecmp(BN->sach.tentacgia, author) == 0)
-            count++;
-    }
-    return count;
-}
-
-//Thống kê nhà xuất bản
-int CountPublisherBooks(Danhmucsach *danhmuc, char publisher[])
-{
-    int count = 0;
-    for (BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
-    {
-        if (strcasecmp(BN->sach.nhaxuatban, publisher) == 0)
-            count++;
-    }
-    return count;
 }
 
 //Các hàm Menu thao tác và lựa chọn
@@ -1432,8 +1476,9 @@ void Luachon1(Danhmucsach *danhmuc)
         {
         	case 'a':
 	        {   
-				printf("Khoi tao danh muc sach rong");
+				printf("Da khoi tao danh muc sach rong.\n");
 	            Khoitao(danhmuc);
+	            system("pause");
 	            return;
 	        }
         	case 'b':
@@ -1717,10 +1762,10 @@ void Luachon6(Danhmucsach *danhmuc)
 	while(1)
 	{
 		system("cls");
-		printf("6. Chuc nang muon/tra sach\n");
-		printf("a. Muon sach\n");
-		printf("b. Tra sach\n");
-		printf("c. Thoat\n");
+		printf("6. Chuc nang muon/tra sach:\n");
+		printf("a. Muon sach.\n");
+		printf("b. Tra sach.\n");
+		printf("c. Thoat.\n");
 		printf("Vui long nhap lua chon cua ban: ");
 		fflush(stdin);
 		lc2 = Nhapluachon('a', 'c');
@@ -1729,28 +1774,34 @@ void Luachon6(Danhmucsach *danhmuc)
 			case 'a':
 			{
 				system("cls");
-				printf("6. Chuc nang muon/tra sach\n");
-				printf("a. Muon sach\n");
+				printf("6. Chuc nang muon/tra sach:\n");
+				printf("a. Muon sach.\n");
 				UnBorrowedBooks(danhmuc);
-				int id;
-				printf("Vui long nhap ma so sach ban muon muon: ");
-				fflush(stdin);
-				id = Nhapmaso();
-				BorrowBooks(danhmuc, id);
+				if(CheckUnBorrowed(danhmuc))
+				{
+					int id;
+					printf("Vui long nhap ma so sach ban muon muon: ");
+					fflush(stdin);
+					id = Nhapmaso();
+					BorrowBooks(danhmuc, id);
+				}
 				system("pause");
 				break;
 			}
 			case 'b':
 			{
 				system("cls");
-				printf("6. Chuc nang muon/tra sach\n");
-				printf("b. Tra sach\n");
+				printf("6. Chuc nang muon/tra sach:\n");
+				printf("b. Tra sach.\n");
 				BorrowedBooks(danhmuc);
-				int id;
-				printf("Vui long nhap ma so sach ban muon tra: ");
-				fflush(stdin);
-				id = Nhapmaso();
-				ReturnBook(danhmuc, id);
+				if(CheckBorrowed(danhmuc))
+				{
+					int id;
+					printf("Vui long nhap ma so sach ban muon tra: ");
+					fflush(stdin);
+					id = Nhapmaso();
+					ReturnBook(danhmuc, id);
+				}
 				system("pause");
 				break;
 			}
@@ -1764,83 +1815,114 @@ void Luachon6(Danhmucsach *danhmuc)
 
 void Luachon7(Danhmucsach *danhmuc)
 {
-	XuatDanhSach(danhmuc);
-	int id;
-	printf("Vui long nhap ma so cua cuon sach ban muon thay doi noi dung:");
-	while(1)
+	if(CountBook(danhmuc))
 	{
-		fflush(stdin);
-		id = Nhapmaso();
-		if(CheckBook(danhmuc, id)) break;
-		else printf("Khong co cuon sach nao co ma so '%d', vui long nhap lai: ", id);
-	}
-	char lc2;
-	while(1){
-		system("cls");
 		XuatDanhSach(danhmuc);
-		printf("Ban muon chinh sua cuon sach co ma so '%d'.\n", id);
-		printf("Danh sach cac thao tac:\n");
-		printf("a. Chinh sua ten sach\n");
-		printf("b. Chinh sua ten tac gia\n");
-		printf("c. Chinh sua ten nha xuat ban\n");
-		printf("d. Chinh sua nam xuat ban\n");
-		printf("e. Chinh sua trang thai sach\n");
-		printf("f. Chinh sua ma so sach\n");
-		printf("g. Thoat.\n");
-		printf("Vui long nhap lua chon cua ban:");
-		fflush(stdin);
-		lc2 = Nhapluachon('a', 'g');
-		switch(lc2)
+		int id;
+		printf("Vui long nhap ma so cua cuon sach ban muon thay doi noi dung: ");
+		while(1)
 		{
-			case 'a':
+			fflush(stdin);
+			id = Nhapmaso();
+			if(CheckBook(danhmuc, id)) break;
+			else printf("Khong co cuon sach nao co ma so '%d', vui long nhap lai: ", id);
+		}
+		char lc2;
+		while(1){
+			system("cls");
+			XuatDanhSach(danhmuc);
+			printf("Ban muon chinh sua cuon sach co ma so '%d'.\n", id);
+			printf("Danh sach cac thao tac:\n");
+			printf("a. Chinh sua ten sach.\n");
+			printf("b. Chinh sua ten tac gia.\n");
+			printf("c. Chinh sua ten nha xuat ban.\n");
+			printf("d. Chinh sua nam xuat ban.\n");
+			printf("e. Chinh sua trang thai sach.\n");
+			printf("f. Chinh sua ma so sach.\n");
+			printf("g. Thoat.\n");
+			printf("Vui long nhap lua chon cua ban: ");
+			fflush(stdin);
+			lc2 = Nhapluachon('a', 'g');
+			switch(lc2)
 			{
-				printf("a. Chinh sua ten sach.\n");
-				char name[50];
-				printf("Ten sach ban muon sua lai la:");
-				fflush(stdin);
-				gets(name);
-				EditNameBook(danhmuc, name, id);
-				system("pause");
-				break;
-			}
-			case 'b':
-			{
-				printf("b. Chinh sua ten tac gia.\n");
-				char author[50];
-				printf("Ten tac gia ban muon sua lai la:");
-				fflush(stdin);
-				gets(author);
-				EditNameAuthor(danhmuc, author, id);
-				system("pause");
-				break;
-			}
-			case 'c':
-			{
-				printf("c. Chinh sua ten nha xuat ban.\n");
-				char publisher[50];
-				printf("Ten nha xuat ban ban muon sua lai la:");
-				fflush(stdin);
-				gets(publisher);
-				EditNamePublisher(danhmuc, publisher, id);
-				system("pause");
-				break;
-			}
-			case 'd':
-			{
-				printf("d. Chinh sua nam xuat ban.\n");
-				int publishingyear;
-				printf("Nam xuat ban ban muon sua lai la:");
-				fflush(stdin);
-				publishingyear = Nhapnamxuatban();
-				EditPublishingYear(danhmuc, publishingyear, id);
-				system("pause");
-				break;
-			}
-			case 'g':
-			{
-				return;
+				case 'a':
+				{
+					printf("a. Chinh sua ten sach.\n");
+					char name[50];
+					printf("Ten sach ban muon sua lai la: ");
+					fflush(stdin);
+					gets(name);
+					EditNameBook(danhmuc, name, id);
+					system("pause");
+					break;
+				}
+				case 'b':
+				{
+					printf("b. Chinh sua ten tac gia.\n");
+					char author[50];
+					printf("Ten tac gia ban muon sua lai la: ");
+					fflush(stdin);
+					gets(author);
+					EditNameAuthor(danhmuc, author, id);
+					system("pause");
+					break;
+				}
+				case 'c':
+				{
+					printf("c. Chinh sua ten nha xuat ban.\n");
+					char publisher[50];
+					printf("Ten nha xuat ban ban muon sua lai la: ");
+					fflush(stdin);
+					gets(publisher);
+					EditNamePublisher(danhmuc, publisher, id);
+					system("pause");
+					break;
+				}
+				case 'd':
+				{
+					printf("d. Chinh sua nam xuat ban.\n");
+					int publishingyear;
+					printf("Nam xuat ban ban muon sua lai la: ");
+					fflush(stdin);
+					publishingyear = Nhapnamxuatban();
+					EditPublishingYear(danhmuc, publishingyear, id);
+					system("pause");
+					break;
+				}
+				case 'e':
+				{
+					printf("e. Chinh sua trang thai sach.\n");
+					EditBookStatus(danhmuc, id);
+					system("pause");
+					break;
+				}
+				case 'f':
+				{
+					printf("f. Chinh sua ma so sach.\n");
+					int id2;
+					printf("Ma so sach ban muon sua lai la: ");
+					while(1)
+					{
+						fflush(stdin);
+						id2 = Nhapmaso();
+						if(CheckBook(danhmuc, id2)) printf("Ma so nay da co trong danh sach, vui long nhap ma so khac: ");
+						else break;
+					}
+					EditID(danhmuc, id2, id);
+					id = id2;
+					system("pause");
+					break;
+				}
+				case 'g':
+				{
+					return;
+				}
 			}
 		}
+	}else
+	{
+		printf("Thu vien hien tai khong co sach.\n");
+		system("pause");
 	}
 }
 
