@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <cstring>
 #include <stdlib.h>
 #include <conio.h>
 
@@ -1064,98 +1065,149 @@ void MergeSortByID(BookNode** headRef) {
     *headRef = MergeListsByID(a, b);
 }
 
-//Sắp Xếp theo tên sách
-void AlphabetNameBook(Danhmucsach *danhmuc)
-{
-	for(BookNode *i = danhmuc->bookHead; i != NULL; i = i->nextbook)
-	{
-		BookNode *tmp = i;
-		for(BookNode *j = i->nextbook; j != NULL; j = j->nextbook)  
-		{
-			if(strcmp(tmp->sach.tensach, j->sach.tensach) > 0)
-			{
-				tmp = j;
-			}
-		}
-		Book t = tmp->sach;
-		tmp->sach = i->sach;
-		i->sach = t;
-	}
-	XuatDanhSach(danhmuc);
+// Hàm hợp nhất 2 danh sách con đã được sắp xếp theo tên sách
+BookNode* MergeListsByName(BookNode* a, BookNode* b) {
+    BookNode* result = NULL;
+
+    // Trường hợp cơ sở: nếu một trong hai danh sách con rỗng, trả về danh sách còn lại
+    if (a == NULL)
+        return b;
+    else if (b == NULL)
+        return a;
+
+    // Hợp nhất hai danh sách con thành một danh sách đã được sắp xếp
+    if (strcasecmp(a->sach.tensach, b->sach.tensach) <= 0) {
+        result = a;
+        result->nextbook = MergeListsByName(a->nextbook, b);
+    } else {
+        result = b;
+        result->nextbook = MergeListsByName(a, b->nextbook);
+    }
+
+    return result;
 }
 
-//Sắp xếp theo Tên Tác Giả
-void AlphabetNameAuthor(Danhmucsach *danhmuc)
-{
-	for(BookNode *i = danhmuc->bookHead; i != NULL; i = i->nextbook)
-	{
-		BookNode *tmp = i;
-		int index1 = 0;
-		char s[50];
-		strcmp(s,i->sach.tentacgia);
-		for(int p = 1; p < strlen(s); p++){
-			if(s[p-1] == ' ') index1 = p;	
-		}
-		for(BookNode *j = i->nextbook; j != NULL; j = j->nextbook) 
-		{
-			int index2 = 0;
-			char c[50];
-			strcmp(c,j->sach.tentacgia);
-			for(int l = 1; l < strlen(c); l++){
-				if(c[l-1] == ' ') index2 = l;	
-			}
-			if(s[index1] > c[index2])
-			{
-				tmp = j;
-			}
-		}
-		Book t = tmp->sach;
-		tmp->sach = i->sach;
-		i->sach = t;
-	}
-	XuatDanhSach(danhmuc);
+// Hàm sắp xếp danh sách sách theo tên sách bằng Merge Sort
+void MergeSortByName(BookNode** headRef) {
+    BookNode* head = *headRef;
+    BookNode* a;
+    BookNode* b;
+
+    // Trường hợp cơ sở: nếu danh sách rỗng hoặc chỉ có một phần tử, không cần sắp xếp
+    if (head == NULL || head->nextbook == NULL)
+        return;
+
+    // Chia danh sách thành hai nửa
+    SplitList(head, &a, &b);
+
+    // Sắp xếp đệ quy hai nửa danh sách
+    MergeSortByName(&a);
+    MergeSortByName(&b);
+
+    // Hợp nhất hai nửa danh sách đã được sắp xếp
+    *headRef = MergeListsByName(a, b);
 }
 
-//Sắp xếp theo Nhà Xuất Bản
-void AlphabetPublisher(Danhmucsach *danhmuc)
+int CompareAuthorName(const char* name1, const char* name2) 
 {
-	for(BookNode *i = danhmuc->bookHead; i != NULL; i = i->nextbook)
-	{
-		BookNode *tmp = i;
-		for(BookNode *j = i->nextbook; j != NULL; j = j->nextbook)  
-		{
-			if(strcmp(tmp->sach.nhaxuatban, j->sach.nhaxuatban) > 0)
-			{
-				tmp = j;
-			}
-		}
-		Book t = tmp->sach;
-		tmp->sach = i->sach;
-		i->sach = t;
-	}
-	XuatDanhSach(danhmuc);
+    char* lastName1 = strrchr(name1, ' ');  // Tìm vị trí cuối cùng của khoảng trắng trong tên
+    char* lastName2 = strrchr(name2, ' ');
+
+    if (lastName1 == NULL) {
+        return -1;  // Nếu không tìm thấy khoảng trắng, xem như tên không có họ và tên lót, đặt tên cuối cùng là toàn bộ tên
+    }
+    if (lastName2 == NULL) {
+        return -1;  // Nếu không tìm thấy khoảng trắng, xem như tên không có họ và tên lót, đặt tên cuối cùng là toàn bộ tên
+    }
+
+    return strcasecmp(lastName1 + 1, lastName2 + 1);  // So sánh tên cuối cùng (loại bỏ khoảng trắng đầu tiên)
 }
 
-//Sắp xếp sách từ mới -> cũ
-void LatestBook(Danhmucsach *danhmuc)
-{
-	for(BookNode *i = danhmuc->bookHead; i != NULL; i = i->nextbook)
-	{
-		BookNode *tmp = i;
-		for(BookNode *j = i->nextbook; j != NULL; j = j->nextbook)  
-		{
-			if(tmp->sach.namxuatban < j->sach.namxuatban)
-			{
-				tmp = j;
-			}
-		}
-		Book t = tmp->sach;
-		tmp->sach = i->sach;
-		i->sach = t;
-	}
-	XuatDanhSach(danhmuc);
+// Hàm hợp nhất 2 danh sách con đã được sắp xếp theo tên tác giả
+BookNode* MergeListsByAuthor(BookNode* a, BookNode* b) {
+    BookNode* result = NULL;
+
+    // Trường hợp cơ sở: nếu một trong hai danh sách con rỗng, trả về danh sách còn lại
+    if (a == NULL)
+        return b;
+    else if (b == NULL)
+        return a;
+
+    // Hợp nhất hai danh sách con thành một danh sách đã được sắp xếp
+    if (CompareAuthorName(a->sach.tentacgia, b->sach.tentacgia) <= 0) {
+        result = a;
+        result->nextbook = MergeListsByAuthor(a->nextbook, b);
+    } else {
+        result = b;
+        result->nextbook = MergeListsByAuthor(a, b->nextbook);
+    }
+
+    return result;
 }
 
+// Hàm sắp xếp danh sách sách theo tên tác giả bằng Merge Sort
+void MergeSortByAuthor(BookNode** headRef) {
+    BookNode* head = *headRef;
+    BookNode* a;
+    BookNode* b;
+
+    // Trường hợp cơ sở: nếu danh sách rỗng hoặc chỉ có một phần tử, không cần sắp xếp
+    if (head == NULL || head->nextbook == NULL)
+        return;
+
+    // Chia danh sách thành hai nửa
+    SplitList(head, &a, &b);
+
+    // Sắp xếp đệ quy hai nửa danh sách
+    MergeSortByAuthor(&a);
+    MergeSortByAuthor(&b);
+
+    // Hợp nhất hai nửa danh sách đã được sắp xếp
+    *headRef = MergeListsByAuthor(a, b);
+}
+
+// Hàm hợp nhất 2 danh sách con đã được sắp xếp theo nhà xuất bản
+BookNode* MergeListsByPublisher(BookNode* a, BookNode* b) {
+    BookNode* result = NULL;
+
+    // Trường hợp cơ sở: nếu một trong hai danh sách con rỗng, trả về danh sách còn lại
+    if (a == NULL)
+        return b;
+    else if (b == NULL)
+        return a;
+
+    // Hợp nhất hai danh sách con thành một danh sách đã được sắp xếp
+    if (strcasecmp(a->sach.nhaxuatban, b->sach.nhaxuatban) <= 0) {
+        result = a;
+        result->nextbook = MergeListsByPublisher(a->nextbook, b);
+    } else {
+        result = b;
+        result->nextbook = MergeListsByPublisher(a, b->nextbook);
+    }
+
+    return result;
+}
+
+// Hàm sắp xếp danh sách sách theo nhà xuất bản bằng Merge Sort
+void MergeSortByPublisher(BookNode** headRef) {
+    BookNode* head = *headRef;
+    BookNode* a;
+    BookNode* b;
+
+    // Trường hợp cơ sở: nếu danh sách rỗng hoặc chỉ có một phần tử, không cần sắp xếp
+    if (head == NULL || head->nextbook == NULL)
+        return;
+
+    // Chia danh sách thành hai nửa
+    SplitList(head, &a, &b);
+
+    // Sắp xếp đệ quy hai nửa danh sách
+    MergeSortByPublisher(&a);
+    MergeSortByPublisher(&b);
+
+    // Hợp nhất hai nửa danh sách đã được sắp xếp
+    *headRef = MergeListsByPublisher(a, b);
+}
 // MENU xem sách theo thứ tự
 void XemDanhSachTheoThuTu(Danhmucsach* danhmuc) {
     while (1) {
@@ -1172,28 +1224,36 @@ void XemDanhSachTheoThuTu(Danhmucsach* danhmuc) {
         fflush(stdin);
         lc3 = Nhapluachon('m', 'r');
         switch (lc3) {
-            case 'm': {
-                AlphabetNameBook(danhmuc);
+            case 'm': 
+			{
+                MergeSortByName(&(danhmuc->bookHead));
+                XuatDanhSach(danhmuc);
                 system("pause");
                 break;
             }
-            case 'n': {
-                AlphabetNameAuthor(danhmuc);
+            case 'n': 
+			{
+                MergeSortByAuthor(&(danhmuc->bookHead));
+                XuatDanhSach(danhmuc);
                 system("pause");
                 break;
             }
-            case 'o': {
-                AlphabetPublisher(danhmuc);
+            case 'o': 
+			{
+                MergeSortByPublisher(&(danhmuc->bookHead));
+                XuatDanhSach(danhmuc);
                 system("pause");
                 break;
             }
-            case 'p': {
+            case 'p': 
+			{
                 MergeSortLatestBook(&(danhmuc->bookHead));
                 XuatDanhSach(danhmuc);
                 system("pause");
                 break;
             }
-            case 'q': {
+            case 'q': 
+			{
                 MergeSortByID(&(danhmuc->bookHead));
                 XuatDanhSach(danhmuc);
                 system("pause");
@@ -1909,7 +1969,8 @@ void menu(int lc1, Danhmucsach *danhmuc)
     }
 }
 
-int main() {
+int main() 
+{
     Danhmucsach danhmuc;
     int lc1;
     menu(lc1, &danhmuc);
