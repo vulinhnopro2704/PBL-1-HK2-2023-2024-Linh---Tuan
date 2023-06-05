@@ -958,24 +958,110 @@ void ReturnBook(Danhmucsach *danhmuc, int id)
 	}
 }
 
-//Sắp xếp theo ID sách
-void SortByID(Danhmucsach *danhmuc)
-{
-	for(BookNode *i = danhmuc->bookHead; i != NULL; i = i->nextbook)
-	{
-		BookNode *tmp = i;
-		for(BookNode *j = i->nextbook; j != NULL; j = j->nextbook)  
-		{
-			if(tmp->sach.masosach > j->sach.masosach)
-			{
-				tmp = j;
-			}
-		}
-		Book t = tmp->sach;
-		tmp->sach = i->sach;
-		i->sach = t;
-	}
-	XuatDanhSach(danhmuc);
+// Hàm chia danh sách thành 2 nửa
+void SplitList(BookNode* source, BookNode** frontRef, BookNode** backRef) {
+    BookNode* slow = source;
+    BookNode* fast = source->nextbook;
+
+    // Sử dụng chiến lược fast runner-slow runner để tìm phần tử giữa danh sách
+    while (fast != NULL) {
+        fast = fast->nextbook;
+        if (fast != NULL) {
+            slow = slow->nextbook;
+            fast = fast->nextbook;
+        }
+    }
+
+    // slow là con trỏ tới phần tử giữa danh sách, chia danh sách thành 2 nửa
+    *frontRef = source;
+    *backRef = slow->nextbook;
+    slow->nextbook = NULL;
+}
+
+// Hàm hợp nhất 2 danh sách con đã được sắp xếp
+BookNode* MergeListsLatestBook(BookNode* a, BookNode* b) {
+    BookNode* result = NULL;
+
+    // Trường hợp cơ sở: nếu một trong hai danh sách con rỗng, trả về danh sách còn lại
+    if (a == NULL)
+        return b;
+    else if (b == NULL)
+        return a;
+
+    // Hợp nhất hai danh sách con thành một danh sách đã được sắp xếp
+    if (a->sach.namxuatban >= b->sach.namxuatban) {
+        result = a;
+        result->nextbook = MergeListsLatestBook(a->nextbook, b);
+    } else {
+        result = b;
+        result->nextbook = MergeListsLatestBook(a, b->nextbook);
+    }
+
+    return result;
+}
+
+// Hàm hợp nhất 2 danh sách con đã được sắp xếp
+BookNode* MergeListsByID(BookNode* a, BookNode* b) {
+    BookNode* result = NULL;
+
+    // Trường hợp cơ sở: nếu một trong hai danh sách con rỗng, trả về danh sách còn lại
+    if (a == NULL)
+        return b;
+    else if (b == NULL)
+        return a;
+
+    // Hợp nhất hai danh sách con thành một danh sách đã được sắp xếp
+    if (a->sach.masosach <= b->sach.masosach) {
+        result = a;
+        result->nextbook = MergeListsByID(a->nextbook, b);
+    } else {
+        result = b;
+        result->nextbook = MergeListsByID(a, b->nextbook);
+    }
+
+    return result;
+}
+
+// Hàm sắp xếp danh sách sách theo năm xuất bản bằng Merge Sort
+void MergeSortLatestBook(BookNode** headRef) {
+    BookNode* head = *headRef;
+    BookNode* a;
+    BookNode* b;
+
+    // Trường hợp cơ sở: nếu danh sách rỗng hoặc chỉ có một phần tử, không cần sắp xếp
+    if (head == NULL || head->nextbook == NULL)
+        return;
+
+    // Chia danh sách thành hai nửa
+    SplitList(head, &a, &b);
+
+    // Sắp xếp đệ quy hai nửa danh sách
+    MergeSortLatestBook(&a);
+    MergeSortLatestBook(&b);
+
+    // Hợp nhất hai nửa danh sách đã được sắp xếp
+    *headRef = MergeListsLatestBook(a, b);
+}
+
+// Hàm sắp xếp danh sách sách theo mã số sách bằng Merge Sort
+void MergeSortByID(BookNode** headRef) {
+    BookNode* head = *headRef;
+    BookNode* a;
+    BookNode* b;
+
+    // Trường hợp cơ sở: nếu danh sách rỗng hoặc chỉ có một phần tử, không cần sắp xếp
+    if (head == NULL || head->nextbook == NULL)
+        return;
+
+    // Chia danh sách thành hai nửa
+    SplitList(head, &a, &b);
+
+    // Sắp xếp đệ quy hai nửa danh sách
+    MergeSortByID(&a);
+    MergeSortByID(&b);
+
+    // Hợp nhất hai nửa danh sách đã được sắp xếp
+    *headRef = MergeListsByID(a, b);
 }
 
 //Sắp Xếp theo tên sách
@@ -1070,63 +1156,56 @@ void LatestBook(Danhmucsach *danhmuc)
 	XuatDanhSach(danhmuc);
 }
 
-//MENU xem sách theo thứ tự
-void XemDanhSachTheoThuTu(Danhmucsach *danhmuc)
-{
-	while(1)
-	{
-		system("cls");
-		char lc3;
-		printf("Xem danh sach theo thu tu:\n");
-		printf("m. Theo van alphabet cua ten sach.\n");
-		printf("n. Theo van alphabet cua ten tac gia.\n");
-		printf("o. Theo van alphabet cua ten nha xuat ban.\n");
-		printf("p. Sach duoc xuat ban moi nhat (theo nam).\n");
-		printf("q. Xem danh sach theo thu tu tang dan cua ID.\n");
-		printf("r. Thoat\n");
-		printf("Vui long nhap lua chon cua ban: ");
-		fflush(stdin);
-		lc3 = Nhapluachon('m', 'r');
-		switch(lc3)
-		{
-			case 'm':
+// MENU xem sách theo thứ tự
+void XemDanhSachTheoThuTu(Danhmucsach* danhmuc) {
+    while (1) {
+        system("cls");
+        char lc3;
+        printf("Xem danh sach theo thu tu:\n");
+        printf("m. Theo van alphabet cua ten sach.\n");
+        printf("n. Theo van alphabet cua ten tac gia.\n");
+        printf("o. Theo van alphabet cua ten nha xuat ban.\n");
+        printf("p. Sach duoc xuat ban moi nhat (theo nam).\n");
+        printf("q. Xem danh sach theo thu tu tang dan cua ID.\n");
+        printf("r. Thoat\n");
+        printf("Vui long nhap lua chon cua ban: ");
+        fflush(stdin);
+        lc3 = Nhapluachon('m', 'r');
+        switch (lc3) {
+            case 'm': {
+                AlphabetNameBook(danhmuc);
+                system("pause");
+                break;
+            }
+            case 'n': {
+                AlphabetNameAuthor(danhmuc);
+                system("pause");
+                break;
+            }
+            case 'o': {
+                AlphabetPublisher(danhmuc);
+                system("pause");
+                break;
+            }
+            case 'p': {
+                MergeSortLatestBook(&(danhmuc->bookHead));
+                XuatDanhSach(danhmuc);
+                system("pause");
+                break;
+            }
+            case 'q': {
+                MergeSortByID(&(danhmuc->bookHead));
+                XuatDanhSach(danhmuc);
+                system("pause");
+                break;
+            }
+            case 'r': 
 			{
-				AlphabetNameBook(danhmuc);
-				system("pause");
-				break;
-			}
-			case 'n':
-			{
-				AlphabetNameAuthor(danhmuc);
-				system("pause");
-				break;
-			}
-			case 'o':
-			{
-				AlphabetPublisher(danhmuc);
-				system("pause");
-				break;
-			}
-			case 'p':
-			{
-				LatestBook(danhmuc);
-				system("pause");
-				break;
-			}
-			case 'q':
-			{
-				SortByID(danhmuc);
-				system("pause");
-				break;
-			}
-			case 'r':
-			{
-				return;
-			}
-		}
-	}
+                return;
+            }
+        }
+    }
 }
-
 //Các hàm chỉnh sửa thông tin sách
 
 //Chỉnh sửa tên sách
