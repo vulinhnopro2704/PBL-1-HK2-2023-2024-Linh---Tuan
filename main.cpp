@@ -945,7 +945,8 @@ void ReturnBook(Danhmucsach *danhmuc, int id)
 					BN->sach.trangthaisach = 1;
 					printf("Cuon sach co ma so '%d' da duoc tra.\n\n", id);
 					return;
-				}else
+				}
+				else
 				{
 					printf("Cuon sach co ma so '%d' khong nam trong danh sach cac cuon sach da muon.\n", id);
 					return;
@@ -953,11 +954,14 @@ void ReturnBook(Danhmucsach *danhmuc, int id)
 			}
 		}
 		printf("Khong co cuon sach nao co ma so '%d'.\n", id);
-	}else
+	}
+	else
 	{
 		printf("Chua co cuon sach nao duoc muon.\n");
 	}
 }
+
+//Các hàm sắp xếp danh sách theo tiêu chí và Các hàm hỗ trợ
 
 // Hàm chia danh sách thành 2 nửa
 void SplitList(BookNode* source, BookNode** frontRef, BookNode** backRef) {
@@ -965,9 +969,11 @@ void SplitList(BookNode* source, BookNode** frontRef, BookNode** backRef) {
     BookNode* fast = source->nextbook;
 
     // Sử dụng chiến lược fast runner-slow runner để tìm phần tử giữa danh sách
-    while (fast != NULL) {
+    while (fast != NULL) 
+	{
         fast = fast->nextbook;
-        if (fast != NULL) {
+        if (fast != NULL) 
+		{
             slow = slow->nextbook;
             fast = fast->nextbook;
         }
@@ -980,7 +986,8 @@ void SplitList(BookNode* source, BookNode** frontRef, BookNode** backRef) {
 }
 
 // Hàm hợp nhất 2 danh sách con đã được sắp xếp
-BookNode* MergeListsLatestBook(BookNode* a, BookNode* b) {
+BookNode* MergeListsLatestBook(BookNode* a, BookNode* b) 
+{
     BookNode* result = NULL;
 
     // Trường hợp cơ sở: nếu một trong hai danh sách con rỗng, trả về danh sách còn lại
@@ -990,10 +997,13 @@ BookNode* MergeListsLatestBook(BookNode* a, BookNode* b) {
         return a;
 
     // Hợp nhất hai danh sách con thành một danh sách đã được sắp xếp
-    if (a->sach.namxuatban >= b->sach.namxuatban) {
+    if (a->sach.namxuatban >= b->sach.namxuatban) 
+	{
         result = a;
         result->nextbook = MergeListsLatestBook(a->nextbook, b);
-    } else {
+    } 
+	else 
+	{
         result = b;
         result->nextbook = MergeListsLatestBook(a, b->nextbook);
     }
@@ -1002,7 +1012,8 @@ BookNode* MergeListsLatestBook(BookNode* a, BookNode* b) {
 }
 
 // Hàm hợp nhất 2 danh sách con đã được sắp xếp
-BookNode* MergeListsByID(BookNode* a, BookNode* b) {
+BookNode* MergeListsByID(BookNode* a, BookNode* b) 
+{
     BookNode* result = NULL;
 
     // Trường hợp cơ sở: nếu một trong hai danh sách con rỗng, trả về danh sách còn lại
@@ -1012,10 +1023,13 @@ BookNode* MergeListsByID(BookNode* a, BookNode* b) {
         return a;
 
     // Hợp nhất hai danh sách con thành một danh sách đã được sắp xếp
-    if (a->sach.masosach <= b->sach.masosach) {
+    if (a->sach.masosach <= b->sach.masosach) 
+	{
         result = a;
         result->nextbook = MergeListsByID(a->nextbook, b);
-    } else {
+    } 
+	else 
+	{
         result = b;
         result->nextbook = MergeListsByID(a, b->nextbook);
     }
@@ -1045,7 +1059,8 @@ void MergeSortLatestBook(BookNode** headRef) {
 }
 
 // Hàm sắp xếp danh sách sách theo mã số sách bằng Merge Sort
-void MergeSortByID(BookNode** headRef) {
+void MergeSortByID(BookNode** headRef) 
+{
     BookNode* head = *headRef;
     BookNode* a;
     BookNode* b;
@@ -1066,7 +1081,8 @@ void MergeSortByID(BookNode** headRef) {
 }
 
 // Hàm hợp nhất 2 danh sách con đã được sắp xếp theo tên sách
-BookNode* MergeListsByName(BookNode* a, BookNode* b) {
+BookNode* MergeListsByName(BookNode* a, BookNode* b) 
+{
     BookNode* result = NULL;
 
     // Trường hợp cơ sở: nếu một trong hai danh sách con rỗng, trả về danh sách còn lại
@@ -1076,10 +1092,13 @@ BookNode* MergeListsByName(BookNode* a, BookNode* b) {
         return a;
 
     // Hợp nhất hai danh sách con thành một danh sách đã được sắp xếp
-    if (strcasecmp(a->sach.tensach, b->sach.tensach) <= 0) {
+    if (strcasecmp(a->sach.tensach, b->sach.tensach) <= 0) 
+	{
         result = a;
         result->nextbook = MergeListsByName(a->nextbook, b);
-    } else {
+    } 
+	else 
+	{
         result = b;
         result->nextbook = MergeListsByName(a, b->nextbook);
     }
@@ -1088,7 +1107,8 @@ BookNode* MergeListsByName(BookNode* a, BookNode* b) {
 }
 
 // Hàm sắp xếp danh sách sách theo tên sách bằng Merge Sort
-void MergeSortByName(BookNode** headRef) {
+void MergeSortByName(BookNode** headRef) .
+{
     BookNode* head = *headRef;
     BookNode* a;
     BookNode* b;
@@ -1124,7 +1144,8 @@ int CompareAuthorName(const char* name1, const char* name2)
 }
 
 // Hàm hợp nhất 2 danh sách con đã được sắp xếp theo tên tác giả
-BookNode* MergeListsByAuthor(BookNode* a, BookNode* b) {
+BookNode* MergeListsByAuthor(BookNode* a, BookNode* b) 
+{
     BookNode* result = NULL;
 
     // Trường hợp cơ sở: nếu một trong hai danh sách con rỗng, trả về danh sách còn lại
@@ -1134,10 +1155,13 @@ BookNode* MergeListsByAuthor(BookNode* a, BookNode* b) {
         return a;
 
     // Hợp nhất hai danh sách con thành một danh sách đã được sắp xếp
-    if (CompareAuthorName(a->sach.tentacgia, b->sach.tentacgia) <= 0) {
+    if (CompareAuthorName(a->sach.tentacgia, b->sach.tentacgia) <= 0) 
+	{
         result = a;
         result->nextbook = MergeListsByAuthor(a->nextbook, b);
-    } else {
+    } 
+	else 
+	{
         result = b;
         result->nextbook = MergeListsByAuthor(a, b->nextbook);
     }
@@ -1167,7 +1191,8 @@ void MergeSortByAuthor(BookNode** headRef) {
 }
 
 // Hàm hợp nhất 2 danh sách con đã được sắp xếp theo nhà xuất bản
-BookNode* MergeListsByPublisher(BookNode* a, BookNode* b) {
+BookNode* MergeListsByPublisher(BookNode* a, BookNode* b) 
+{
     BookNode* result = NULL;
 
     // Trường hợp cơ sở: nếu một trong hai danh sách con rỗng, trả về danh sách còn lại
@@ -1177,10 +1202,13 @@ BookNode* MergeListsByPublisher(BookNode* a, BookNode* b) {
         return a;
 
     // Hợp nhất hai danh sách con thành một danh sách đã được sắp xếp
-    if (strcasecmp(a->sach.nhaxuatban, b->sach.nhaxuatban) <= 0) {
+    if (strcasecmp(a->sach.nhaxuatban, b->sach.nhaxuatban) <= 0) 
+	{
         result = a;
         result->nextbook = MergeListsByPublisher(a->nextbook, b);
-    } else {
+    } 
+	else 
+	{
         result = b;
         result->nextbook = MergeListsByPublisher(a, b->nextbook);
     }
@@ -1189,7 +1217,8 @@ BookNode* MergeListsByPublisher(BookNode* a, BookNode* b) {
 }
 
 // Hàm sắp xếp danh sách sách theo nhà xuất bản bằng Merge Sort
-void MergeSortByPublisher(BookNode** headRef) {
+void MergeSortByPublisher(BookNode** headRef) 
+{
     BookNode* head = *headRef;
     BookNode* a;
     BookNode* b;
@@ -1209,8 +1238,10 @@ void MergeSortByPublisher(BookNode** headRef) {
     *headRef = MergeListsByPublisher(a, b);
 }
 // MENU xem sách theo thứ tự
-void XemDanhSachTheoThuTu(Danhmucsach* danhmuc) {
-    while (1) {
+void XemDanhSachTheoThuTu(Danhmucsach* danhmuc) 
+{
+    while (1) 
+	{
         system("cls");
         char lc3;
         printf("Xem danh sach theo thu tu:\n");
@@ -1223,7 +1254,8 @@ void XemDanhSachTheoThuTu(Danhmucsach* danhmuc) {
         printf("Vui long nhap lua chon cua ban: ");
         fflush(stdin);
         lc3 = Nhapluachon('m', 'r');
-        switch (lc3) {
+        switch (lc3) 
+		{
             case 'm': 
 			{
                 MergeSortByName(&(danhmuc->bookHead));
