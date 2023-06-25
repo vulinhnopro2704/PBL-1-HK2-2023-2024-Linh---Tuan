@@ -149,22 +149,22 @@ int CheckBook(Danhmucsach *danhmuc, int id)
 void Nhapsach(Danhmucsach *danhmuc, Book *sach)
 {
 
-	printf("Nhap ma so sach:");
+	printf("Nhap ma so sach: ");
 	while(1)
 	{
 		sach->masosach = Nhapmaso();
 		if(!CheckBook(danhmuc, sach->masosach)) break;
 		else printf("Ma so nay da co trong danh sach, vui long nhap lai ma so khac: ");
 	}
-    printf("Nhap nam xuat ban:");
+    printf("Nhap nam xuat ban: ");
     sach->namxuatban = Nhapnamxuatban();
-    printf("Nhap ten sach:");
+    printf("Nhap ten sach: ");
     fflush(stdin);
 	gets(sach->tensach);
-    printf("Nhap ten tac gia:");
+    printf("Nhap ten tac gia: ");
     fflush(stdin);
     gets(sach->tentacgia);
-    printf("Nhap ten nha xuat ban:");
+    printf("Nhap ten nha xuat ban: ");
     fflush(stdin);
     gets(sach->nhaxuatban);
     sach->trangthaisach = 1;
@@ -341,11 +341,11 @@ void XuatDanhSach(Danhmucsach *danhmuc)
 {
 	if(CountBook(danhmuc))
 	{
-		int ID = 10, book = 40, author = 25, NXB = 25, NamXB = 10, TrangThai = 12;
+		int ID = 10, book = 40, author = 30, NXB = 25, NamXB = 10, TrangThai = 12;
 		int sum = ID + book + author + NXB + NamXB + TrangThai + 7;
 		printf("						Bang danh muc sach\n") ;
 		for(int i = 1; i <= sum; i++) printf("_");
-		printf("\n|%10s|%40s|%25s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
+		printf("\n|%10s|%40s|%30s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
 		printf("|");
 		for(int i = 1; i <= ID;i++) printf("_");
 		printf("|");
@@ -361,7 +361,7 @@ void XuatDanhSach(Danhmucsach *danhmuc)
 		printf("|");
 	    for(BookNode *BN = danhmuc->bookHead; BN != NULL; BN = BN->nextbook)
 	    {
-	    	printf("\n|%10d|%40s|%25s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
+	    	printf("\n|%10d|%40s|%30s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
 	    	if(BN->sach.trangthaisach)
 	        {
 	             printf("%12s|\n","Chua muon");
@@ -621,10 +621,10 @@ void FindNameBook(Danhmucsach *danhmuc, char name[50])
 {
 	printf("				Thong tin nhung cuon sach co ten la %s\n", name) ;
 	// In ra tiêu đề bảng
-	int ID = 10, book = 40, author = 25, NXB = 25, NamXB = 10, TrangThai = 12;
+	int ID = 10, book = 40, author = 30, NXB = 25, NamXB = 10, TrangThai = 12;
 	int sum = ID + book + author + NXB + NamXB + TrangThai + 7;
 	for(int i = 1; i <= sum; i++) printf("_");
-	printf("\n|%10s|%40s|%25s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
+	printf("\n|%10s|%40s|%30s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
 	printf("|");
 	for(int i = 1; i <= ID;i++) printf("_");
 	printf("|");
@@ -642,7 +642,7 @@ void FindNameBook(Danhmucsach *danhmuc, char name[50])
     {
     	if(strcasecmp(BN->sach.tensach, name) == 0)
 		{
-	    	printf("\n|%10d|%40s|%25s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
+	    	printf("\n|%10d|%40s|%30s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
 	    	if(BN->sach.trangthaisach)
 	        {
 	             printf("%12s|\n","Chua muon");
@@ -675,10 +675,10 @@ void FindNameAuthor(Danhmucsach *danhmuc, char author[50])
 {
 	printf("				Thong tin nhung cuon sach cua tac gia: %s\n", author) ;
 	// In ra tiêu đề bảng
-	int ID = 10, book = 40, authors = 25, NXB = 25, NamXB = 10, TrangThai = 12;
+	int ID = 10, book = 40, authors = 30, NXB = 25, NamXB = 10, TrangThai = 12;
 	int sum = ID + book + authors + NXB + NamXB + TrangThai + 7;
 	for(int i = 1; i <= sum; i++) printf("_");
-	printf("\n|%10s|%40s|%25s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
+	printf("\n|%10s|%40s|%30s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
 	printf("|");
 	for(int i = 1; i <= ID;i++) printf("_");
 	printf("|");
@@ -696,7 +696,7 @@ void FindNameAuthor(Danhmucsach *danhmuc, char author[50])
     {
     	if(strcasecmp(BN->sach.tentacgia, author) == 0)
 		{
-	    	printf("\n|%10d|%40s|%25s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
+	    	printf("\n|%10d|%40s|%30s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
 	    	if(BN->sach.trangthaisach)
 	        {
 	             printf("%12s|\n","Chua muon");
@@ -729,10 +729,10 @@ void FindNamePublisher(Danhmucsach *danhmuc, char publisher[50])
 {
 	printf("				Thong tin nhung cuon sach co nha xuat ban la %s\n", publisher) ;
 	// In ra tiêu đề bảng
-	int ID = 10, book = 40, authors = 25, NXB = 25, NamXB = 10, TrangThai = 12;
+	int ID = 10, book = 40, authors = 30, NXB = 25, NamXB = 10, TrangThai = 12;
 	int sum = ID + book + authors + NXB + NamXB + TrangThai + 7;
 	for(int i = 1; i <= sum; i++) printf("_");
-	printf("\n|%10s|%40s|%25s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
+	printf("\n|%10s|%40s|%30s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
 	printf("|");
 	for(int i = 1; i <= ID;i++) printf("_");
 	printf("|");
@@ -750,7 +750,7 @@ void FindNamePublisher(Danhmucsach *danhmuc, char publisher[50])
     {
     	if(strcasecmp(BN->sach.nhaxuatban, publisher) == 0)
 		{
-	    	printf("\n|%10d|%40s|%25s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
+	    	printf("\n|%10d|%40s|%30s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
 	    	if(BN->sach.trangthaisach)
 	        {
 	             printf("%12s|\n","Chua muon");
@@ -783,10 +783,10 @@ void FindYearPublish(Danhmucsach *danhmuc, int year)
 {
 	printf("				Thong tin nhung cuon sach co nam xuat ban la %d\n", year) ;
 	// In ra tiêu đề bảng
-	int ID = 10, book = 40, authors = 25, NXB = 25, NamXB = 10, TrangThai = 12;
+	int ID = 10, book = 40, authors = 30, NXB = 25, NamXB = 10, TrangThai = 12;
 	int sum = ID + book + authors + NXB + NamXB + TrangThai + 7;
 	for(int i = 1; i <= sum; i++) printf("_");
-	printf("\n|%10s|%40s|%25s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
+	printf("\n|%10s|%40s|%30s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
 	printf("|");
 	for(int i = 1; i <= ID;i++) printf("_");
 	printf("|");
@@ -804,7 +804,7 @@ void FindYearPublish(Danhmucsach *danhmuc, int year)
     {
     	if(BN->sach.namxuatban == year)
 		{
-	    	printf("\n|%10d|%40s|%25s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
+	    	printf("\n|%10d|%40s|%30s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
 	    	if(BN->sach.trangthaisach)
 	        {
 	             printf("%12s|\n","Chua muon");
@@ -863,10 +863,10 @@ void BorrowedBooks(Danhmucsach *danhmuc)
 	if(CheckBorrowed(danhmuc))
 	{
 		printf("				  Thong tin nhung cuon sach da cho muon\n") ;
-		int ID = 10, book = 40, authors = 25, NXB = 25, NamXB = 10, TrangThai = 12;
+		int ID = 10, book = 40, authors = 30, NXB = 25, NamXB = 10, TrangThai = 12;
 		int sum = ID + book + authors + NXB + NamXB + TrangThai + 7;
 		for(int i = 1; i <= sum; i++) printf("_");
-		printf("\n|%10s|%40s|%25s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
+		printf("\n|%10s|%40s|%30s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
 		printf("|");
 		for(int i = 1; i <= ID;i++) printf("_");
 		printf("|");
@@ -884,7 +884,7 @@ void BorrowedBooks(Danhmucsach *danhmuc)
 	    {
 	    	if(BN->sach.trangthaisach == 0)
 			{
-		    	printf("\n|%10d|%40s|%25s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
+		    	printf("\n|%10d|%40s|%30s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
 		    	if(BN->sach.trangthaisach)
 		        {
 		             printf("%12s|\n","Chua muon");
@@ -922,10 +922,10 @@ void UnBorrowedBooks(Danhmucsach *danhmuc)
 	if(CheckUnBorrowed(danhmuc))
 	{
 		printf("				  Thong tin nhung cuon sach chua cho muon\n") ;
-		int ID = 10, book = 40, authors = 25, NXB = 25, NamXB = 10, TrangThai = 12;
+		int ID = 10, book = 40, authors = 30, NXB = 25, NamXB = 10, TrangThai = 12;
 		int sum = ID + book + authors + NXB + NamXB + TrangThai + 7;
 		for(int i = 1; i <= sum; i++) printf("_");
-		printf("\n|%10s|%40s|%25s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
+		printf("\n|%10s|%40s|%30s|%25s|%10s|%12s|\n","ID","TEN SACH","TAC GIA","NHA XUAT BAN","NAM","TRANG THAI");
 		printf("|");
 		for(int i = 1; i <= ID;i++) printf("_");
 		printf("|");
@@ -943,7 +943,7 @@ void UnBorrowedBooks(Danhmucsach *danhmuc)
 	    {
 	    	if(BN->sach.trangthaisach)
 			{
-		    	printf("\n|%10d|%40s|%25s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
+		    	printf("\n|%10d|%40s|%30s|%25s|%10d|", BN->sach.masosach, BN->sach.tensach, BN->sach.tentacgia, BN->sach.nhaxuatban, BN->sach.namxuatban);
 		    	if(BN->sach.trangthaisach)
 		        {
 		             printf("%12s|\n","Chua muon");
